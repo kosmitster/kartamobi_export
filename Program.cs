@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ExportToService
 {
@@ -12,6 +9,11 @@ namespace ExportToService
     {
         static void Main(string[] args)
         {
+
+
+            var restApiClient = new RestApiClient();
+
+
 
             var inCardBonuses = new List<Dto>();
             var outCardBonuses = new List<Dto>();
