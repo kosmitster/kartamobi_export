@@ -46,6 +46,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
@@ -62,13 +63,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Db\DbData.cs" />
     <Compile Include="Dto.cs" />
+    <Compile Include="JSON\AnswerSetAmount.cs" />
     <Compile Include="JSON\AnswerToken.cs" />
     <Compile Include="JSON\InfoCardBonus.cs" />
     <Compile Include="JSON\InfoCardBonusBalance.cs" />
+    <Compile Include="Log\LogWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RestApiClient.cs" />
+    <Compile Include="KartaMobi\RestApiClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
