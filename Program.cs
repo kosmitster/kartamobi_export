@@ -2,21 +2,18 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 
 namespace ExportToService
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-
-
             var restApiClient = new RestApiClient();
 
-
-
-            var inCardBonuses = new List<Dto>();
-            var outCardBonuses = new List<Dto>();
+            List<Dto> inCardBonuses;
+            List<Dto> outCardBonuses;
 
             using (var sqlConnection = new SqlConnection(@"Integrated Security=true;Initial Catalog=ddd;Data Source=localhost;"))
             {
@@ -24,7 +21,28 @@ namespace ExportToService
 
                 inCardBonuses = GetTransaction(sqlConnection, TypeBonus.InCard);
                 outCardBonuses = GetTransaction(sqlConnection, TypeBonus.OutCard);
+
+                sqlConnection.Close();
             }
+
+            foreach (var inCard in inCardBonuses.Take(10))
+            {
+                if (!string.IsNullOrEmpty(inCard.PhoneNumber))
+                {
+                    var uToken = restApiClient.GetUTokenClient(inCard.PhoneNumber);
+                    restApiClient.SetAmountInCard(inCard, uToken);
+                }
+            }
+
+            foreach (var outCard in outCardBonuses.Take(5))
+            {
+                if (!string.IsNullOrEmpty(outCard.PhoneNumber))
+                {
+                    var uToken = restApiClient.GetUTokenClient(outCard.PhoneNumber);
+                    restApiClient.SetAmountOutCard(outCard, uToken);
+                }
+            }
+
 
             Console.ReadKey();
         }
@@ -56,6 +74,7 @@ namespace ExportToService
                 {
                     CardId = (string)myReader["CardID"],
                     Amount = (decimal)myReader["Sum"],
+                    OrderId = (string)myReader["Description"]
                 }); 
             }
             myReader.Close();
