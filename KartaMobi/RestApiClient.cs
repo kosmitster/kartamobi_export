@@ -75,10 +75,10 @@ namespace ExportToService.KartaMobi
         /// Отправка номера карты клиента
         /// </summary>
         /// <returns></returns>
-        public void SetNumberCard(Dto dto)
+        public void SetNumberCard(Dto dto, string uToken)
         {
             var path = "/api/v1/cards/number";
-            var answer = ExecuteHttp(path);
+            var answer = ExecuteHttp(path, SerializeInfoCard(dto, uToken));
             if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
             {
                 Log.LogWriter.Write(@"[OK] Обновление номера карты клиента " + dto.CardNumber);
@@ -187,6 +187,16 @@ namespace ExportToService.KartaMobi
                 u_token = uToken,
                 summ = dto.Amount.ToString(CultureInfo.InvariantCulture),
                 total = dto.Balance.ToString(CultureInfo.InvariantCulture)
+            });
+        }
+
+        private string SerializeInfoCard(Dto dto, string uToken)
+        {
+            return JsonConvert.SerializeObject(new InfoBonusCard
+            {
+                b_token = b_token,
+                u_token = uToken,
+                card_num = dto.CardNumber
             });
         }
 

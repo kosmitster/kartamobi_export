@@ -66,6 +66,7 @@
     <Compile Include="Db\DbData.cs" />
     <Compile Include="Dto.cs" />
     <Compile Include="JSON\AnswerToken.cs" />
+    <Compile Include="JSON\InfoBonusCard.cs" />
     <Compile Include="JSON\InfoBonusInCard.cs" />
     <Compile Include="JSON\InfoBonusOutCard.cs" />
     <Compile Include="JSON\InfoCardBonusBalance.cs" />

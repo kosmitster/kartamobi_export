@@ -24,7 +24,7 @@ namespace ExportToService
                 if (!string.IsNullOrEmpty(inCard.PhoneNumber))
                 {
                     var uToken = restApiClient.GetUTokenClient(inCard.PhoneNumber);
-                    restApiClient.SetNumberCard(inCard);
+                    restApiClient.SetNumberCard(inCard, uToken);
                     restApiClient.SetAmountInCard(inCard, uToken);
                 }
                 else
@@ -38,7 +38,7 @@ namespace ExportToService
                 if (!string.IsNullOrEmpty(outCard.PhoneNumber))
                 {
                     var uToken = restApiClient.GetUTokenClient(outCard.PhoneNumber);
-                    restApiClient.SetNumberCard(outCard);
+                    restApiClient.SetNumberCard(outCard, uToken);
                     restApiClient.SetAmountOutCard(outCard, uToken);
                 }
                 else
