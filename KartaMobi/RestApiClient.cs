@@ -12,9 +12,9 @@ namespace ExportToService.KartaMobi
 {
     public class RestApiClient
     {
-        private string b_token;
-        private string login;
-        private string password;
+        private readonly string b_token;
+        private readonly string login;
+        private readonly string password;
 
         public RestApiClient()
         {
@@ -68,6 +68,25 @@ namespace ExportToService.KartaMobi
             }
 
             return uToken;
+        }
+
+
+        /// <summary>
+        /// Отправка номера карты клиента
+        /// </summary>
+        /// <returns></returns>
+        public void SetNumberCard(Dto dto)
+        {
+            var path = "/api/v1/cards/number";
+            var answer = ExecuteHttp(path);
+            if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
+            {
+                Log.LogWriter.Write(@"[OK] Обновление номера карты клиента " + dto.CardNumber);
+            }
+            else
+            {
+                Log.LogWriter.Write(@"[Error] Ошибка Обновление номера карты клиента " + JObject.Parse(answer.Content)["status"]);
+            }
         }
 
         /// <summary>
