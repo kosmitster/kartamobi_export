@@ -61,6 +61,7 @@ namespace ExportToService.Db
             {
                 exportData.Add(new Dto
                 {
+                    TransactionId = (string)myReader["TransactionID"],
                     CardId = (string)myReader["CardID"],
                     Amount = (decimal)myReader["Sum"],
                     OrderId = (string)myReader["Description"]
@@ -73,7 +74,7 @@ namespace ExportToService.Db
             {
                 dto.CardNumber = GetCardNumberByCardId(sqlConnection, dto.CardId);
                 dto.PhoneNumber = GetPhoneByCard(sqlConnection, dto.CardNumber);
-                dto.Balance = GetBalanceCardByCardId(sqlConnection, dto.CardId);
+                dto.Balance = GetBalanceCardByTransactionId(sqlConnection, dto.TransactionId);
             }
 
             return exportData;
@@ -145,27 +146,27 @@ namespace ExportToService.Db
         /// ПолучитьБалансКарты
         /// </summary>
         /// <param name="sqlConnection">SQL подключение</param>
-        /// <param name="idCard">уникальный идентификатор карты</param>
+        /// <param name="transactionId">уникальный идентификатор транзакции</param>
         /// <returns></returns>
-        private static decimal GetBalanceCardByCardId(SqlConnection sqlConnection, string idCard)
+        private static decimal GetBalanceCardByTransactionId(SqlConnection sqlConnection, string transactionId)
         {
             decimal balance = 0;
 
             var testCmd = new SqlCommand
-                ("ds_GetCard", sqlConnection)
+                ("ds_GetTransaction", sqlConnection)
                 { CommandType = CommandType.StoredProcedure };
 
             var retVal = testCmd.Parameters.Add("RetVal", SqlDbType.Int);
             retVal.Direction = ParameterDirection.ReturnValue;
 
-            var cardId = testCmd.Parameters.Add("@CardID", SqlDbType.VarChar, 38);
-            cardId.Direction = ParameterDirection.Input;
-            cardId.Value = idCard;
+            var paramTransactionId = testCmd.Parameters.Add("@TransactionID", SqlDbType.VarChar, 38);
+            paramTransactionId.Direction = ParameterDirection.Input;
+            paramTransactionId.Value = transactionId;
 
             var myReader = testCmd.ExecuteReader();
             while (myReader.Read())
             {
-                balance = (decimal)myReader["Balance"];
+                balance = (decimal)myReader["CardBalance"];
             }
             myReader.Close();
 

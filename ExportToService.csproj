@@ -65,9 +65,9 @@
   <ItemGroup>
     <Compile Include="Db\DbData.cs" />
     <Compile Include="Dto.cs" />
-    <Compile Include="JSON\AnswerSetAmount.cs" />
     <Compile Include="JSON\AnswerToken.cs" />
-    <Compile Include="JSON\InfoCardBonus.cs" />
+    <Compile Include="JSON\InfoBonusInCard.cs" />
+    <Compile Include="JSON\InfoBonusOutCard.cs" />
     <Compile Include="JSON\InfoCardBonusBalance.cs" />
     <Compile Include="Log\LogWriter.cs" />
     <Compile Include="Program.cs" />

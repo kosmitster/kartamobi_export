@@ -36,8 +36,8 @@ namespace ExportToService.KartaMobi
                 var answer = ExecuteHttp(path, SerializeBalaceInfoBonus(dto, uToken));
                 if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
                 {
-                    var data = JsonConvert.DeserializeObject<AnswerSetAmount>(answer.Content).data;
-                    Log.LogWriter.Write(@"[OK] ПРЯМОЕ ОБНОВЛЕНИЕ БОНУСНОГО БАЛАНСА " + data.u_token + " - " + data.bonuses);
+                    Log.LogWriter.Write(@"[OK] ПРЯМОЕ ОБНОВЛЕНИЕ БОНУСНОГО БАЛАНСА " + dto.Balance +
+                                        " - результат на сервере " + (string) JObject.Parse(answer.Content)["bonuses"]);
                 }
                 else
                 {
@@ -81,15 +81,16 @@ namespace ExportToService.KartaMobi
             {
                 UpdateBalance(dto, uToken);
                 var path = "/api/v1/market/bonuses/force-accrual";
-                var answer = ExecuteHttp(path, SerializeMoveInfoBonus(dto, uToken));
+                var answer = ExecuteHttp(path, SerializeMoveBonusInCard(dto, uToken));
                 if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
                 {
-                    var data = JsonConvert.DeserializeObject<AnswerSetAmount>(answer.Content).data;
-                    Log.LogWriter.Write(@"[OK] Произведено начисление бонуса " + data.u_token + " на сумму " + dto.Amount);
+                    Log.LogWriter.Write(@"[OK] Произведено начисление бонуса " + dto.PhoneNumber + " на сумму " + dto.Amount);
                 }
                 else
                 {
-                    Log.LogWriter.Write(@"[Error] При начисленнии произошла ошибка " + answer.StatusCode + " " + answer.Content);
+                    Log.LogWriter.Write(@"[Error] При начисленнии произошла ошибка телефон=" + dto.PhoneNumber +
+                                        " сумма=" + dto.Amount + " " +
+                                        (string) JObject.Parse(answer.Content)["message"]);
                 }
             }
         }
@@ -105,29 +106,29 @@ namespace ExportToService.KartaMobi
             {
                 UpdateBalance(dto, uToken);
                 var path = "/api/v1/market/bonuses/force-writeoff";
-                var answer = ExecuteHttp(path, SerializeMoveInfoBonus(dto, uToken));
+                var answer = ExecuteHttp(path, SerializeMoveBonusOutCard(dto, uToken));
                 if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
                 {
-                    var data = JsonConvert.DeserializeObject<AnswerSetAmount>(answer.Content).data;
-                    Log.LogWriter.Write(@"[OK] Произведено списание бонуса " + data.u_token + " на сумму " + dto.Amount);                    
+                    Log.LogWriter.Write(@"[OK] Произведено списание бонуса " + dto.PhoneNumber + " на сумму " + dto.Amount);                    
                 }
                 else
                 {
-                    Log.LogWriter.Write(@"[Error] При списании произошла ошибка " + dto.PhoneNumber + " " +
+                    Log.LogWriter.Write(@"[Error] При списании произошла ошибка телефон=" + dto.PhoneNumber +
+                                        " сумма=" + dto.Amount + " " +
                                         (string) JObject.Parse(answer.Content)["message"]);
                 }
             }
         }
 
         /// <summary>
-        /// СериализоватьИнформациюОДвиженииБонусов
+        /// СериализоватьИнформациюОДвиженииНачисленияБонусов
         /// </summary>
         /// <param name="dto">информация о  движении</param>
         /// <param name="uToken">токен клиента</param>
         /// <returns></returns>
-        private string SerializeMoveInfoBonus(Dto dto, string uToken)
+        private string SerializeMoveBonusInCard(Dto dto, string uToken)
         {
-            return JsonConvert.SerializeObject(new InfoCardBonus
+            return JsonConvert.SerializeObject(new InfoBonusInCard
             {
                 b_token = b_token,
                 u_token = uToken,
@@ -137,10 +138,27 @@ namespace ExportToService.KartaMobi
         }
 
         /// <summary>
-        /// СериализоватьИнформациюООст
+        /// СериализоватьИнформациюОДвиженииСписанияБонусов
         /// </summary>
-        /// <param name="dto"></param>
-        /// <param name="uToken"></param>
+        /// <param name="dto">информация о  движении</param>
+        /// <param name="uToken">токен клиента</param>
+        /// <returns></returns>
+        private string SerializeMoveBonusOutCard(Dto dto, string uToken)
+        {
+            return JsonConvert.SerializeObject(new InfoBonusOutCard
+            {
+                b_token = b_token,
+                u_token = uToken,
+                bonuses = dto.Amount.ToString(CultureInfo.InvariantCulture)
+            });
+        }
+
+
+        /// <summary>
+        /// СериализоватьИнформациюООстаткахБонусов
+        /// </summary>
+        /// <param name="dto">информация о движении</param>
+        /// <param name="uToken">токен клиента</param>
         /// <returns></returns>
         private string SerializeBalaceInfoBonus(Dto dto, string uToken)
         {
