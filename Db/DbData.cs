@@ -17,8 +17,11 @@ namespace ExportToService.Db
         {
             var initCatalog = ConfigurationManager.AppSettings["DB_InitialCatalog"];
             var dataSource = ConfigurationManager.AppSettings["DB_dataSource"];
+            var login = ConfigurationManager.AppSettings["DB_login"];
+            var password = ConfigurationManager.AppSettings["DB_password"];
 
-            using (var sqlConnection = new SqlConnection(@"Integrated Security=true;Initial Catalog=" + initCatalog +
+            using (var sqlConnection = new SqlConnection(@"Integrated Security=True;Trusted_Connection=True;User ID=" + login +
+                                                         ";Password=" + password + ";Initial Catalog=" + initCatalog +
                                                          ";Data Source=" + dataSource + ";"))
             {
                 sqlConnection.Open();
