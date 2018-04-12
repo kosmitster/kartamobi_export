@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Globalization;
 using System.Net;
+using ExportToService.Dto;
 using ExportToService.JSON;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -12,15 +13,18 @@ namespace ExportToService.KartaMobi
 {
     public class RestApiClient
     {
-        private readonly string b_token;
-        private readonly string login;
-        private readonly string password;
+        private readonly string _bToken;
+        private readonly string _login;
+        private readonly string _password;
 
+        /// <summary>
+        /// КлиентДляРаботыС_Karta.Mobi
+        /// </summary>
         public RestApiClient()
         {
-            b_token = ConfigurationManager.AppSettings["KartaMobi_btoken"];
-            login = ConfigurationManager.AppSettings["KartaMobi_login"];
-            password = ConfigurationManager.AppSettings["KartaMobi_password"];
+            _bToken = ConfigurationManager.AppSettings["KartaMobi_btoken"];
+            _login = ConfigurationManager.AppSettings["KartaMobi_login"];
+            _password = ConfigurationManager.AppSettings["KartaMobi_password"];
         }
 
         /// <summary>
@@ -55,7 +59,7 @@ namespace ExportToService.KartaMobi
         public string GetUTokenClient(string phone)
         {
             string uToken = string.Empty;
-            var path = "/api/v1/client/get-utoken-by-phone?" + "b_token=" + b_token + "&" + "phone=" + phone;
+            var path = "/api/v1/client/get-utoken-by-phone?" + "b_token=" + _bToken + "&" + "phone=" + phone;
             var answer = ExecuteHttp(path);
             if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
             {
@@ -75,14 +79,13 @@ namespace ExportToService.KartaMobi
         /// <summary>
         /// Отправка номера карты клиента
         /// </summary>
-        /// <returns></returns>
-        public void SetNumberCard(Dto dto, string uToken)
+        public void SetNumberCard(TransactionInfo transactionInfo, string uToken)
         {
             var path = "/api/v1/cards/number";
-            var answer = ExecuteHttp(path, SerializeInfoCard(dto, uToken));
+            var answer = ExecuteHttp(path, SerializeInfoCard(transactionInfo, uToken));
             if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
             {
-                Log.LogWriter.Write(@"[OK] Обновление номера карты клиента " + dto.CardNumber);
+                Log.LogWriter.Write(@"[OK] Обновление номера карты клиента " + transactionInfo.CardNumber);
             }
             else
             {
@@ -93,53 +96,53 @@ namespace ExportToService.KartaMobi
         /// <summary>
         /// ОтправитьНачисленияБонусов
         /// </summary>
-        /// <param name="dto">информация о начислении</param>
+        /// <param name="transactionInfo">информация о начислении</param>
         /// <param name="uToken">токен клиента</param>
-        public void SetAmountInCard(Dto dto, string uToken)
+        public void SetAmountInCard(TransactionInfo transactionInfo, string uToken)
         {
             if (!string.IsNullOrEmpty(uToken))
             {
                 var path = "/api/v1/market/bonuses/force-accrual";
-                var answer = ExecuteHttp(path, SerializeMoveBonusInCard(dto, uToken));
+                var answer = ExecuteHttp(path, SerializeMoveBonusInCard(transactionInfo, uToken));
                 if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
                 {
-                    Log.LogWriter.Write(@"[OK] Произведено начисление бонуса " + dto.PhoneNumber + 
-                        " на сумму " + dto.Amount + 
+                    Log.LogWriter.Write(@"[OK] Произведено начисление бонуса " + transactionInfo.PhoneNumber + 
+                        " на сумму " + transactionInfo.Amount + 
                         " - на сервере bonuses = " + (string) JObject.Parse(answer.Content)["data"]["bonuses"]);
                 }
                 else
                 {
-                    Log.LogWriter.Write(@"[Error] При начисленнии произошла ошибка телефон=" + dto.PhoneNumber +
-                                        " сумма=" + dto.Amount + 
+                    Log.LogWriter.Write(@"[Error] При начисленнии произошла ошибка телефон=" + transactionInfo.PhoneNumber +
+                                        " сумма=" + transactionInfo.Amount + 
                                         " - сообщение сервиса=" + (string) JObject.Parse(answer.Content)["message"]);
                 }
-                UpdateBalance(dto.Balance + dto.Amount, uToken);
+                UpdateBalance(transactionInfo.Balance + transactionInfo.Amount, uToken);
             }
         }
 
         /// <summary>
         /// ОтправитьСписанияБонусов
         /// </summary>
-        /// <param name="dto">информация о списании</param>
+        /// <param name="transactionInfo">информация о списании</param>
         /// <param name="uToken">токен клиента</param>
-        public void SetAmountOutCard(Dto dto, string uToken)
+        public void SetAmountOutCard(TransactionInfo transactionInfo, string uToken)
         {
             if (!string.IsNullOrEmpty(uToken))
             {
-                UpdateBalance(dto.Balance, uToken);
+                UpdateBalance(transactionInfo.Balance, uToken);
                 var path = "/api/v1/market/bonuses/force-writeoff";
-                var answer = ExecuteHttp(path, SerializeMoveBonusOutCard(dto, uToken));
+                var answer = ExecuteHttp(path, SerializeMoveBonusOutCard(transactionInfo, uToken));
                 if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
                 {
-                    Log.LogWriter.Write(@"[OK] Произведено списание бонуса " + dto.PhoneNumber + 
-                        " на сумму " + dto.Amount + 
+                    Log.LogWriter.Write(@"[OK] Произведено списание бонуса " + transactionInfo.PhoneNumber + 
+                        " на сумму " + transactionInfo.Amount + 
                         " - на сервере bonuses = " + (string) JObject.Parse(answer.Content)["data"]["bonuses"] +
                         " - на сервере writeoff = " + (string) JObject.Parse(answer.Content)["data"]["writeoff"]);
                 }
                 else
                 {
-                    Log.LogWriter.Write(@"[Error] При списании произошла ошибка телефон=" + dto.PhoneNumber +
-                                        " сумма=" + dto.Amount + 
+                    Log.LogWriter.Write(@"[Error] При списании произошла ошибка телефон=" + transactionInfo.PhoneNumber +
+                                        " сумма=" + transactionInfo.Amount + 
                                         " - сообщение сервиса=" + (string) JObject.Parse(answer.Content)["message"]);
                 }                
             }
@@ -148,32 +151,32 @@ namespace ExportToService.KartaMobi
         /// <summary>
         /// СериализоватьИнформациюОДвиженииНачисленияБонусов
         /// </summary>
-        /// <param name="dto">информация о  движении</param>
+        /// <param name="transactionInfo">информация о  движении</param>
         /// <param name="uToken">токен клиента</param>
         /// <returns></returns>
-        private string SerializeMoveBonusInCard(Dto dto, string uToken)
+        private string SerializeMoveBonusInCard(TransactionInfo transactionInfo, string uToken)
         {
             return JsonConvert.SerializeObject(new InfoBonusInCard
             {
-                b_token = b_token,
+                b_token = _bToken,
                 u_token = uToken,
-                bonuses = dto.Amount.ToString(CultureInfo.InvariantCulture)
+                bonuses = transactionInfo.Amount.ToString(CultureInfo.InvariantCulture)
             });
         }
 
         /// <summary>
         /// СериализоватьИнформациюОДвиженииСписанияБонусов
         /// </summary>
-        /// <param name="dto">информация о  движении</param>
+        /// <param name="transactionInfo">информация о  движении</param>
         /// <param name="uToken">токен клиента</param>
         /// <returns></returns>
-        private string SerializeMoveBonusOutCard(Dto dto, string uToken)
+        private string SerializeMoveBonusOutCard(TransactionInfo transactionInfo, string uToken)
         {
             return JsonConvert.SerializeObject(new InfoBonusOutCard
             {
-                b_token = b_token,
+                b_token = _bToken,
                 u_token = uToken,
-                bonuses = dto.Amount.ToString(CultureInfo.InvariantCulture)
+                bonuses = transactionInfo.Amount.ToString(CultureInfo.InvariantCulture)
             });
         }
 
@@ -188,19 +191,25 @@ namespace ExportToService.KartaMobi
         {
             return JsonConvert.SerializeObject(new InfoCardBonusBalance
             {
-                b_token = b_token,
+                b_token = _bToken,
                 u_token = uToken,
                 total = balance.ToString(CultureInfo.InvariantCulture)
             });
         }
 
-        private string SerializeInfoCard(Dto dto, string uToken)
+        /// <summary>
+        /// СериализоватьИнформациюОКарте
+        /// </summary>
+        /// <param name="transactionInfo"></param>
+        /// <param name="uToken"></param>
+        /// <returns></returns>
+        private string SerializeInfoCard(TransactionInfo transactionInfo, string uToken)
         {
             return JsonConvert.SerializeObject(new InfoBonusCard
             {
-                b_token = b_token,
+                b_token = _bToken,
                 u_token = uToken,
-                card_num = dto.CardNumber
+                card_num = transactionInfo.CardNumber
             });
         }
 
@@ -215,7 +224,7 @@ namespace ExportToService.KartaMobi
             var client = new RestClient
             {
                 BaseUrl = new Uri("http://dev.karta.mobi"),
-                Authenticator = new HttpBasicAuthenticator(login, password)
+                Authenticator = new HttpBasicAuthenticator(_login, _password)
             };
             
             var request = new RestRequest(path);

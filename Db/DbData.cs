@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using ExportToService.Dto;
 
 namespace ExportToService.Db
 {
@@ -12,14 +13,14 @@ namespace ExportToService.Db
         /// <summary>
         /// ПолучитьДанныеОДвижениях
         /// </summary>
-        public static List<Dto> GetTransactionFromDb()
+        public static List<TransactionInfo> GetTransactionFromDb()
         {
             var initCatalog = ConfigurationManager.AppSettings["DB_InitialCatalog"];
             var dataSource = ConfigurationManager.AppSettings["DB_dataSource"];
             var login = ConfigurationManager.AppSettings["DB_login"];
             var password = ConfigurationManager.AppSettings["DB_password"];
 
-            var transactions = new List<Dto>();
+            var transactions = new List<TransactionInfo>();
             
             using (var sqlConnection = new SqlConnection(@"Integrated Security=True;Trusted_Connection=True;User ID=" + login +
                                                          ";Password=" + password + ";Initial Catalog=" + initCatalog +
@@ -40,9 +41,9 @@ namespace ExportToService.Db
         /// </summary>
         /// <param name="sqlConnection">SQL подключение</param>
         /// <returns></returns>
-        private static IEnumerable<Dto> GetTransaction(SqlConnection sqlConnection)
+        private static IEnumerable<TransactionInfo> GetTransaction(SqlConnection sqlConnection)
         {
-            var exportData = new List<Dto>();
+            var exportData = new List<TransactionInfo>();
             var testCmd = new SqlCommand
                 ("ds_GetTransactions", sqlConnection)
                 {CommandType = CommandType.StoredProcedure};
@@ -64,12 +65,11 @@ namespace ExportToService.Db
                 //Если тип транзакции = "Начисление бонусов" или "Списание бонусов"
                 if ((int) myReader["TransactionType"] == 7 || (int) myReader["TransactionType"] == 2)
                 {
-                    exportData.Add(new Dto
+                    exportData.Add(new TransactionInfo
                     {
                         TransactionId = (string) myReader["TransactionID"],
                         CardId = (string) myReader["CardID"],
                         Amount = (decimal) myReader["Sum"],
-                        OrderId = (string) myReader["Description"],
                         TypeBonus = (TypeBonus) myReader["TransactionType"],
                         TransactionDateTime = (DateTime) myReader["TransactionDateTime"]
                     });
@@ -78,11 +78,11 @@ namespace ExportToService.Db
             myReader.Close();
 
             //заполняем дополнительные реквизиты
-            foreach (var dto in exportData)
+            foreach (var transactionInfo in exportData)
             {
-                dto.CardNumber = GetCardNumberByCardId(sqlConnection, dto.CardId);
-                dto.PhoneNumber = GetPhoneByCard(sqlConnection, dto.CardNumber);
-                dto.Balance = GetBalanceCardByTransactionId(sqlConnection, dto.TransactionId);
+                transactionInfo.CardNumber = GetCardNumberByCardId(sqlConnection, transactionInfo.CardId);
+                transactionInfo.PhoneNumber = GetPhoneByCard(sqlConnection, transactionInfo.CardNumber);
+                transactionInfo.Balance = GetBalanceCardByTransactionId(sqlConnection, transactionInfo.TransactionId);
             }
 
             return exportData.AsEnumerable();

@@ -70,7 +70,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Db\DbData.cs" />
-    <Compile Include="Dto.cs" />
+    <Compile Include="Db\DbSqlite.cs" />
+    <Compile Include="Dto\TransactionInfo.cs" />
     <Compile Include="JSON\AnswerToken.cs" />
     <Compile Include="JSON\InfoBonusCard.cs" />
     <Compile Include="JSON\InfoBonusInCard.cs" />
