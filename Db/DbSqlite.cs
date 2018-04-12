@@ -1,4 +1,6 @@
-﻿using System.Configuration;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Configuration;
 using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
@@ -31,6 +33,17 @@ namespace ExportToService.Db
         }
 
         /// <summary>
+        /// ПолучитьРезультатВыполненияКоманды
+        /// </summary>
+        /// <param name="sql">команда</param>
+        /// <param name="mDbConnection">подключение</param>
+        /// <returns></returns>
+        private IEnumerable<string> GetResultCommand(string sql, SQLiteConnection mDbConnection)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        /// <summary>
         /// Конструктор {создаёт базу в случае если её нет и все потраха}
         /// </summary>
         public DbSqlite()
@@ -38,25 +51,27 @@ namespace ExportToService.Db
             _dbFileName = ConfigurationManager.AppSettings["SqliteFilePath"];
 
             if (!File.Exists(_dbFileName))
+            {
                 SQLiteConnection.CreateFile(_dbFileName);
 
-            var mDbConnection = GetSqLiteConnection();
-            mDbConnection.Open();
+                var mDbConnection = GetSqLiteConnection();
+                mDbConnection.Open();
 
-            //Создать таблицу для успешно отправленных транзакций
-            SetCommand(
-                "CREATE TABLE IF NOT EXISTS SentTransactions (TransactionID [VARCHAR](38), CardID [VARCHAR](38), TransactionType [INT], Sum [DECIMAL](17,2), TransactionDateTime [DateTime])",
-                mDbConnection);
-            //Создать таблицу для сбойных транзакций
-            SetCommand(
-                "CREATE TABLE IF NOT EXISTS ErrorTransactions (TransactionID [VARCHAR](38), CardID [VARCHAR](38), TransactionType [INT], Sum [DECIMAL](17,2), TransactionDateTime [DateTime])",
-                mDbConnection);
-            //Создать триггер для удаления сбойных транзакций в случае если транзакция успешно отправлена
-            SetCommand(
-                "CREATE TRIGGER IF NOT EXISTS ErrorTransactionDisabled AFTER INSERT ON SentTransactions BEGIN DELETE FROM ErrorTransactions WHERE TransactionID = NEW.TransactionID; END;",
-                mDbConnection);
+                //Создать таблицу для успешно отправленных транзакций
+                SetCommand(
+                    "CREATE TABLE IF NOT EXISTS SentTransactions (TransactionID [VARCHAR](38), CardID [VARCHAR](38), TransactionType [INT], Sum [DECIMAL](17,2), TransactionDateTime [DateTime])",
+                    mDbConnection);
+                //Создать таблицу для сбойных транзакций
+                SetCommand(
+                    "CREATE TABLE IF NOT EXISTS ErrorTransactions (TransactionID [VARCHAR](38), CardID [VARCHAR](38), TransactionType [INT], Sum [DECIMAL](17,2), TransactionDateTime [DateTime])",
+                    mDbConnection);
+                //Создать триггер для удаления сбойных транзакций в случае если транзакция успешно отправлена
+                SetCommand(
+                    "CREATE TRIGGER IF NOT EXISTS ErrorTransactionDisabled AFTER INSERT ON SentTransactions BEGIN DELETE FROM ErrorTransactions WHERE TransactionID = NEW.TransactionID; END;",
+                    mDbConnection);
 
-            mDbConnection.Close();
+                mDbConnection.Close();
+            }
         }
 
         /// <summary>
@@ -93,7 +108,23 @@ namespace ExportToService.Db
                 ", " + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + ")", mDbConnection);
 
             mDbConnection.Close();
-        }        
+        }
+
+        /// <summary>
+        /// ПолучитьСписокСбойныхТранзакций
+        /// </summary>
+        /// <returns>Список сбойных транзакций</returns>
+        public IEnumerable<string> GetErrorTransactions()
+        {
+            var mDbConnection = GetSqLiteConnection();
+            mDbConnection.Open();
+
+            var errorTransactions = GetResultCommand("", mDbConnection);
+
+            mDbConnection.Close();
+
+            return errorTransactions;
+        }
 
     }
 }
