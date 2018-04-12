@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 
 namespace ExportToService.Db
 {
@@ -11,61 +12,69 @@ namespace ExportToService.Db
         /// <summary>
         /// ПолучитьДанныеОДвижениях
         /// </summary>
-        /// <param name="inCardBonuses">СписокНачисления</param>
-        /// <param name="outCardBonuses">СписокСписаний</param>
-        public static void GetData(out List<Dto> inCardBonuses, out List<Dto> outCardBonuses)
+        public static List<Dto> GetTransactionFromDb()
         {
             var initCatalog = ConfigurationManager.AppSettings["DB_InitialCatalog"];
             var dataSource = ConfigurationManager.AppSettings["DB_dataSource"];
             var login = ConfigurationManager.AppSettings["DB_login"];
             var password = ConfigurationManager.AppSettings["DB_password"];
 
+            var transactions = new List<Dto>();
+            
             using (var sqlConnection = new SqlConnection(@"Integrated Security=True;Trusted_Connection=True;User ID=" + login +
                                                          ";Password=" + password + ";Initial Catalog=" + initCatalog +
                                                          ";Data Source=" + dataSource + ";"))
             {
                 sqlConnection.Open();
 
-                inCardBonuses = GetTransaction(sqlConnection, TypeBonus.InCard);
-                outCardBonuses = GetTransaction(sqlConnection, TypeBonus.OutCard);
+                transactions.AddRange(GetTransaction(sqlConnection));
 
                 sqlConnection.Close();
             }
+
+            return transactions;
         }
 
         /// <summary>
-        /// ПолучитьДвиженияБонусовНаКарту
+        /// ПолучитьТранзакцииПоНачислениюИСписаниюБонусов
         /// </summary>
         /// <param name="sqlConnection">SQL подключение</param>
-        /// <param name="typeBonus">Тип бонуса</param>
         /// <returns></returns>
-        private static List<Dto> GetTransaction(SqlConnection sqlConnection, TypeBonus typeBonus)
+        private static IEnumerable<Dto> GetTransaction(SqlConnection sqlConnection)
         {
             var exportData = new List<Dto>();
             var testCmd = new SqlCommand
                 ("ds_GetTransactions", sqlConnection)
-                { CommandType = CommandType.StoredProcedure };
+                {CommandType = CommandType.StoredProcedure};
 
             var retVal = testCmd.Parameters.Add("RetVal", SqlDbType.Int);
             retVal.Direction = ParameterDirection.ReturnValue;
 
-            var transactionType = testCmd.Parameters.Add("@TransactionType", SqlDbType.Int, (int)typeBonus);
-            transactionType.Direction = ParameterDirection.Input;
+            var paramOrderBy = testCmd.Parameters.Add("@OrderBy", SqlDbType.Int);
+            paramOrderBy.Direction = ParameterDirection.Input;
+            paramOrderBy.Value = 0;
 
             var paramBeginDate = testCmd.Parameters.Add("@BeginDate", SqlDbType.DateTime);
             paramBeginDate.Direction = ParameterDirection.Input;
-            paramBeginDate.Value = DateTime.Now.AddMinutes(-5);
+            //paramBeginDate.Value = DateTime.Now.AddMinutes(-5);
+            paramBeginDate.Value = new DateTime(2018, 04, 11);
 
             var myReader = testCmd.ExecuteReader();
             while (myReader.Read())
             {
-                exportData.Add(new Dto
+                //Если тип транзакции = "Начисление бонусов" или "Списание бонусов"
+                if ((int) myReader["TransactionType"] == 7 || (int) myReader["TransactionType"] == 2)
                 {
-                    TransactionId = (string)myReader["TransactionID"],
-                    CardId = (string)myReader["CardID"],
-                    Amount = (decimal)myReader["Sum"],
-                    OrderId = (string)myReader["Description"]
-                });
+                    exportData.Add(new Dto
+                    {
+                        TransactionId = (string) myReader["TransactionID"],
+                        CardId = (string) myReader["CardID"],
+                        Amount = (decimal) myReader["Sum"],
+                        OrderId = (string) myReader["Description"],
+                        TypeBonus = (TypeBonus) myReader["TransactionType"],
+                        TransactionDateTime = (DateTime) myReader["TransactionDateTime"]
+                    });
+                }
             }
             myReader.Close();
 
@@ -77,7 +86,7 @@ namespace ExportToService.Db
                 dto.Balance = GetBalanceCardByTransactionId(sqlConnection, dto.TransactionId);
             }
 
-            return exportData;
+            return exportData.AsEnumerable();
         }
 
         /// <summary>
@@ -172,7 +181,5 @@ namespace ExportToService.Db
 
             return balance;
         }
-
-        private enum TypeBonus { InCard = 7, OutCard = 2 }
     }
 }

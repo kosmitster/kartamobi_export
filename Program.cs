@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ExportToService.Db;
 using ExportToService.KartaMobi;
 using ExportToService.Log;
@@ -16,53 +17,39 @@ namespace ExportToService
 
                 var restApiClient = new RestApiClient();
 
-                List<Dto> inCardBonuses;
-                List<Dto> outCardBonuses;
 
-                DbData.GetData(out inCardBonuses, out outCardBonuses);
+                 var transactions= DbData.GetTransactionFromDb();
 
-                foreach (var inCard in inCardBonuses)
+                foreach (var transaction in transactions)
                 {
-                    if (!string.IsNullOrEmpty(inCard.PhoneNumber))
+                    if (!string.IsNullOrEmpty(transaction.PhoneNumber))
                     {
-                        var uToken = restApiClient.GetUTokenClient(inCard.PhoneNumber);
+                        var uToken = restApiClient.GetUTokenClient(transaction.PhoneNumber);
                         if (!string.IsNullOrEmpty(uToken))
                         {
-                            restApiClient.SetNumberCard(inCard, uToken);
-                            restApiClient.SetAmountInCard(inCard, uToken);
+                            restApiClient.SetNumberCard(transaction, uToken);
+                            switch (transaction.TypeBonus)
+                            {
+                                case TypeBonus.InCard:
+                                    restApiClient.SetAmountInCard(transaction, uToken);
+                                    break;
+                                case TypeBonus.OutCard:
+                                    restApiClient.SetAmountOutCard(transaction, uToken);
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
                         }
                         else
                         {
-                            LogWriter.Write("[Error] Ошибка получения u_token " + inCard.PhoneNumber);
+                            LogWriter.Write("[Error] Ошибка получения u_token " + transaction.PhoneNumber);
                         }
                     }
                     else
                     {
-                        LogWriter.Write("[Error] Не привязан номер телефона к карте " + inCard.CardNumber);
+                        LogWriter.Write("[Error] Не привязан номер телефона к карте " + transaction.CardNumber);
                     }
                 }
-
-                foreach (var outCard in outCardBonuses)
-                {
-                    if (!string.IsNullOrEmpty(outCard.PhoneNumber))
-                    {
-                        var uToken = restApiClient.GetUTokenClient(outCard.PhoneNumber);
-                        if (!string.IsNullOrEmpty(uToken))
-                        {
-                            restApiClient.SetNumberCard(outCard, uToken);
-                            restApiClient.SetAmountOutCard(outCard, uToken);
-                        }
-                        else
-                        {
-                            LogWriter.Write("[Error] Ошибка получения u_token " + outCard.PhoneNumber);
-                        }
-                    }
-                    else
-                    {
-                        LogWriter.Write("[Error] Не привязан номер телефона к карте " + outCard.CardNumber);
-                    }
-                }
-
                 LogWriter.Write(DateTime.Now + " ***Окончание импорта***");
             }
             catch (Exception e)
