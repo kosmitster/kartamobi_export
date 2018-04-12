@@ -16,7 +16,7 @@ namespace ExportToService
 
                 var restApiClient = new RestApiClient();
 
-                var errorTransaction = new DbSqlite().GetErrorTransactions();
+                //var errorTransaction = new DbSqlite().GetErrorTransactions();
 
                 var transactions = DbData.GetTransactionFromDb();
 
