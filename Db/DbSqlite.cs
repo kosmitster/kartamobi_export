@@ -107,16 +107,22 @@ namespace ExportToService.Db
         /// <param name="transactionInfo">Информация о транзакции</param>
         public void SaveErrorTransaction(TransactionInfo transactionInfo)
         {
-            var mDbConnection = GetSqLiteConnection();
-            mDbConnection.Open();
+            //Исключим добавление дублей
+            if (!GetErrorTransactions().Contains(transactionInfo.TransactionId))
+            {
+                var mDbConnection = GetSqLiteConnection();
+                mDbConnection.Open();
 
-            SetCommand(
-                "INSERT INTO ErrorTransactions(TransactionID, CardID, TransactionType, Sum, TransactionDateTime) VALUES ('" +
-                transactionInfo.TransactionId + "', '" + transactionInfo.CardId + "', " +
-                (int) transactionInfo.TypeBonus + ", " + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
-                ", '" + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "')", mDbConnection);
+                SetCommand(
+                    "INSERT INTO ErrorTransactions(TransactionID, CardID, TransactionType, Sum, TransactionDateTime) VALUES ('" +
+                    transactionInfo.TransactionId + "', '" + transactionInfo.CardId + "', " +
+                    (int) transactionInfo.TypeBonus + ", " +
+                    transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
+                    ", '" + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "')",
+                    mDbConnection);
 
-            mDbConnection.Close();
+                mDbConnection.Close();
+            }
         }
 
         /// <summary>
