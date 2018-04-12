@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Globalization;
 using System.Net;
+using ExportToService.Db;
 using ExportToService.Dto;
 using ExportToService.JSON;
 using Newtonsoft.Json;
@@ -16,12 +17,15 @@ namespace ExportToService.KartaMobi
         private readonly string _bToken;
         private readonly string _login;
         private readonly string _password;
+        private readonly DbSqlite _dbSqlite;
 
         /// <summary>
         /// КлиентДляРаботыС_Karta.Mobi
         /// </summary>
         public RestApiClient()
         {
+            _dbSqlite = new DbSqlite();
+
             _bToken = ConfigurationManager.AppSettings["KartaMobi_btoken"];
             _login = ConfigurationManager.AppSettings["KartaMobi_login"];
             _password = ConfigurationManager.AppSettings["KartaMobi_password"];
@@ -109,12 +113,15 @@ namespace ExportToService.KartaMobi
                     Log.LogWriter.Write(@"[OK] Произведено начисление бонуса " + transactionInfo.PhoneNumber + 
                         " на сумму " + transactionInfo.Amount + 
                         " - на сервере bonuses = " + (string) JObject.Parse(answer.Content)["data"]["bonuses"]);
+                    _dbSqlite.SaveSentTransaction(transactionInfo);
+
                 }
                 else
                 {
                     Log.LogWriter.Write(@"[Error] При начисленнии произошла ошибка телефон=" + transactionInfo.PhoneNumber +
                                         " сумма=" + transactionInfo.Amount + 
                                         " - сообщение сервиса=" + (string) JObject.Parse(answer.Content)["message"]);
+                    _dbSqlite.SaveErrorTransaction(transactionInfo);
                 }
                 UpdateBalance(transactionInfo.Balance + transactionInfo.Amount, uToken);
             }
@@ -138,12 +145,14 @@ namespace ExportToService.KartaMobi
                         " на сумму " + transactionInfo.Amount + 
                         " - на сервере bonuses = " + (string) JObject.Parse(answer.Content)["data"]["bonuses"] +
                         " - на сервере writeoff = " + (string) JObject.Parse(answer.Content)["data"]["writeoff"]);
+                    _dbSqlite.SaveSentTransaction(transactionInfo);
                 }
                 else
                 {
                     Log.LogWriter.Write(@"[Error] При списании произошла ошибка телефон=" + transactionInfo.PhoneNumber +
                                         " сумма=" + transactionInfo.Amount + 
                                         " - сообщение сервиса=" + (string) JObject.Parse(answer.Content)["message"]);
+                    _dbSqlite.SaveErrorTransaction(transactionInfo);
                 }                
             }
         }

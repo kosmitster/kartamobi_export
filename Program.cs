@@ -12,30 +12,6 @@ namespace ExportToService
         {
             try
             {
-                var dbSqlite = new DbSqlite();
-                dbSqlite.SaveSentTransaction(new TransactionInfo
-                {
-                    Amount = new decimal(15.2),
-                    Balance = 150,
-                    PhoneNumber = "79151407306",
-                    CardId = "{F504BD18-C0DD-4B10-B9EB-886C81400DAF}",
-                    CardNumber = "3214170411931",
-                    TypeBonus = TypeBonus.InCard,
-                    TransactionDateTime = DateTime.Now,
-                    TransactionId = "B2B9DA07-2C5F-4C6A-AC5D-37D1525418E4"
-                });
-                dbSqlite.SaveErrorTransaction(new TransactionInfo
-                {
-                    Amount = new decimal(15.2),
-                    Balance = 150,
-                    PhoneNumber = "79151407306",
-                    CardId = "{F504BD18-C0DD-4B10-B9EB-886C81400DAF}",
-                    CardNumber = "3214170411931",
-                    TypeBonus = TypeBonus.InCard,
-                    TransactionDateTime = DateTime.Now,
-                    TransactionId = "B2B9DA07-2C5F-4C6A-AC5D-37D1525418E4"
-                });                
-
                 LogWriter.Write(DateTime.Now + " ***Начало импорта***");
 
                 var restApiClient = new RestApiClient();
