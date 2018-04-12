@@ -26,18 +26,19 @@ namespace ExportToService.KartaMobi
         /// <summary>
         /// ПрямоеОбновлениеБонусногоБаланса
         /// </summary>
-        /// <param name="dto">информация о движении</param>
+        /// <param name="balance">остаток на карте</param>
         /// <param name="uToken">токен клиента</param>
-        private void UpdateBalance(Dto dto, string uToken)
+        private void UpdateBalance(decimal balance, string uToken)
         {
             if (!string.IsNullOrEmpty(uToken))
             {
                 var path = "/api/v1/client/balance";
-                var answer = ExecuteHttp(path, SerializeBalaceInfoBonus(dto, uToken));
+                var answer = ExecuteHttp(path, SerializeBalaceInfoBonus(balance, uToken));
                 if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
                 {
-                    Log.LogWriter.Write(@"[OK] ПРЯМОЕ ОБНОВЛЕНИЕ БОНУСНОГО БАЛАНСА " + dto.Balance +
-                                        " - результат на сервере " + (string) JObject.Parse(answer.Content)["bonuses"]);
+                    Log.LogWriter.Write(@"[OK] ПРЯМОЕ ОБНОВЛЕНИЕ БОНУСНОГО БАЛАНСА " + balance +
+                                        " - результат на сервере bonuses=" + (string) JObject.Parse(answer.Content)["data"]["bonuses"] +
+                                        " - результат на сервере delta=" + (string)JObject.Parse(answer.Content)["data"]["delta"]);
                 }
                 else
                 {
@@ -56,7 +57,7 @@ namespace ExportToService.KartaMobi
             string uToken = string.Empty;
             var path = "/api/v1/client/get-utoken-by-phone?" + "b_token=" + b_token + "&" + "phone=" + phone;
             var answer = ExecuteHttp(path);
-            if (answer.StatusCode == HttpStatusCode.OK)
+            if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
             {
                 var data = JsonConvert.DeserializeObject<AnswerToken>(answer.Content).data;
                 uToken = data.u_token;
@@ -98,19 +99,21 @@ namespace ExportToService.KartaMobi
         {
             if (!string.IsNullOrEmpty(uToken))
             {
-                UpdateBalance(dto, uToken);
                 var path = "/api/v1/market/bonuses/force-accrual";
                 var answer = ExecuteHttp(path, SerializeMoveBonusInCard(dto, uToken));
                 if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
                 {
-                    Log.LogWriter.Write(@"[OK] Произведено начисление бонуса " + dto.PhoneNumber + " на сумму " + dto.Amount);
+                    Log.LogWriter.Write(@"[OK] Произведено начисление бонуса " + dto.PhoneNumber + 
+                        " на сумму " + dto.Amount + 
+                        " - на сервере bonuses = " + (string) JObject.Parse(answer.Content)["data"]["bonuses"]);
                 }
                 else
                 {
                     Log.LogWriter.Write(@"[Error] При начисленнии произошла ошибка телефон=" + dto.PhoneNumber +
-                                        " сумма=" + dto.Amount + " " +
-                                        (string) JObject.Parse(answer.Content)["message"]);
+                                        " сумма=" + dto.Amount + 
+                                        " - сообщение сервиса=" + (string) JObject.Parse(answer.Content)["message"]);
                 }
+                UpdateBalance(dto.Balance + dto.Amount, uToken);
             }
         }
 
@@ -123,19 +126,22 @@ namespace ExportToService.KartaMobi
         {
             if (!string.IsNullOrEmpty(uToken))
             {
-                UpdateBalance(dto, uToken);
+                UpdateBalance(dto.Balance, uToken);
                 var path = "/api/v1/market/bonuses/force-writeoff";
                 var answer = ExecuteHttp(path, SerializeMoveBonusOutCard(dto, uToken));
                 if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
                 {
-                    Log.LogWriter.Write(@"[OK] Произведено списание бонуса " + dto.PhoneNumber + " на сумму " + dto.Amount);                    
+                    Log.LogWriter.Write(@"[OK] Произведено списание бонуса " + dto.PhoneNumber + 
+                        " на сумму " + dto.Amount + 
+                        " - на сервере bonuses = " + (string) JObject.Parse(answer.Content)["data"]["bonuses"] +
+                        " - на сервере writeoff = " + (string) JObject.Parse(answer.Content)["data"]["writeoff"]);
                 }
                 else
                 {
                     Log.LogWriter.Write(@"[Error] При списании произошла ошибка телефон=" + dto.PhoneNumber +
-                                        " сумма=" + dto.Amount + " " +
-                                        (string) JObject.Parse(answer.Content)["message"]);
-                }
+                                        " сумма=" + dto.Amount + 
+                                        " - сообщение сервиса=" + (string) JObject.Parse(answer.Content)["message"]);
+                }                
             }
         }
 
@@ -151,7 +157,6 @@ namespace ExportToService.KartaMobi
             {
                 b_token = b_token,
                 u_token = uToken,
-                order_id = "1",
                 bonuses = dto.Amount.ToString(CultureInfo.InvariantCulture)
             });
         }
@@ -176,17 +181,16 @@ namespace ExportToService.KartaMobi
         /// <summary>
         /// СериализоватьИнформациюООстаткахБонусов
         /// </summary>
-        /// <param name="dto">информация о движении</param>
+        /// <param name="balance">Остаток на карте</param>
         /// <param name="uToken">токен клиента</param>
         /// <returns></returns>
-        private string SerializeBalaceInfoBonus(Dto dto, string uToken)
+        private string SerializeBalaceInfoBonus(decimal balance, string uToken)
         {
             return JsonConvert.SerializeObject(new InfoCardBonusBalance
             {
                 b_token = b_token,
                 u_token = uToken,
-                summ = dto.Amount.ToString(CultureInfo.InvariantCulture),
-                total = dto.Balance.ToString(CultureInfo.InvariantCulture)
+                total = balance.ToString(CultureInfo.InvariantCulture)
             });
         }
 
