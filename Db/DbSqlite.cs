@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using ExportToService.Dto;
 
 namespace ExportToService.Db
@@ -40,7 +41,17 @@ namespace ExportToService.Db
         /// <returns></returns>
         private IEnumerable<string> GetResultCommand(string sql, SQLiteConnection mDbConnection)
         {
-            throw new System.NotImplementedException();
+            var result = new List<string>();
+            var command = new SQLiteCommand(sql, mDbConnection);
+            var myReader = command.ExecuteReader();
+
+            while (myReader.Read())
+            {
+                result.Add((string) myReader["TransactionID"]);
+            }
+            myReader.Close();
+
+            return result.AsEnumerable();
         }
 
         /// <summary>
@@ -119,7 +130,7 @@ namespace ExportToService.Db
             var mDbConnection = GetSqLiteConnection();
             mDbConnection.Open();
 
-            var errorTransactions = GetResultCommand("", mDbConnection);
+            var errorTransactions = GetResultCommand("SELECT TransactionID FROM ErrorTransactions", mDbConnection);
 
             mDbConnection.Close();
 
