@@ -98,7 +98,7 @@ namespace ExportToService.Db
                 "INSERT INTO SentTransactions(TransactionID, CardID, TransactionType, Sum, TransactionDateTime) VALUES ('" +
                 transactionInfo.TransactionId + "', '" + transactionInfo.CardId + "', " +
                 (int) transactionInfo.TypeBonus + ", " + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
-                ", " + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + ")", mDbConnection);
+                ", '" + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "')", mDbConnection);
 
             mDbConnection.Close();            
         }
@@ -116,7 +116,7 @@ namespace ExportToService.Db
                 "INSERT INTO ErrorTransactions(TransactionID, CardID, TransactionType, Sum, TransactionDateTime) VALUES ('" +
                 transactionInfo.TransactionId + "', '" + transactionInfo.CardId + "', " +
                 (int) transactionInfo.TypeBonus + ", " + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
-                ", " + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + ")", mDbConnection);
+                ", '" + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "')", mDbConnection);
 
             mDbConnection.Close();
         }
