@@ -45,15 +45,15 @@ namespace ExportToService.Db
 
             //Создать таблицу для успешно отправленных транзакций
             SetCommand(
-                "CREATE TABLE IF NOT EXISTS SentTransactions (TransactionID [VARCHAR](38), CardID [VARCHAR](38), TransactionType [INT], Sum [DECIMAL](17,2))",
+                "CREATE TABLE IF NOT EXISTS SentTransactions (TransactionID [VARCHAR](38), CardID [VARCHAR](38), TransactionType [INT], Sum [DECIMAL](17,2), TransactionDateTime [DateTime])",
                 mDbConnection);
             //Создать таблицу для сбойных транзакций
             SetCommand(
-                "CREATE TABLE IF NOT EXISTS ErrorTransactions (TransactionID [VARCHAR](38), CardID [VARCHAR](38), TransactionType [INT], Sum [DECIMAL](17,2))",
+                "CREATE TABLE IF NOT EXISTS ErrorTransactions (TransactionID [VARCHAR](38), CardID [VARCHAR](38), TransactionType [INT], Sum [DECIMAL](17,2), TransactionDateTime [DateTime])",
                 mDbConnection);
             //Создать триггер для удаления сбойных транзакций в случае если транзакция успешно отправлена
             SetCommand(
-                "CREATE TRIGGER ErrorTransactionDisabled AFTER INSERT ON SentTransactions BEGIN DELETE FROM ErrorTransactions WHERE TransactionID = NEW.TransactionID; END;",
+                "CREATE TRIGGER IF NOT EXISTS ErrorTransactionDisabled AFTER INSERT ON SentTransactions BEGIN DELETE FROM ErrorTransactions WHERE TransactionID = NEW.TransactionID; END;",
                 mDbConnection);
 
             mDbConnection.Close();
@@ -68,9 +68,11 @@ namespace ExportToService.Db
             var mDbConnection = GetSqLiteConnection();
             mDbConnection.Open();
 
-            SetCommand("INSERT INTO SentTransactions(TransactionID, CardID, TransactionType, Sum) VALUES ('" +
-                       transactionInfo.TransactionId + "', '" + transactionInfo.CardId + "', " +
-                       (int) transactionInfo.TypeBonus + ", " + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) + ")", mDbConnection);
+            SetCommand(
+                "INSERT INTO SentTransactions(TransactionID, CardID, TransactionType, Sum, TransactionDateTime) VALUES ('" +
+                transactionInfo.TransactionId + "', '" + transactionInfo.CardId + "', " +
+                (int) transactionInfo.TypeBonus + ", " + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
+                ", " + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + ")", mDbConnection);
 
             mDbConnection.Close();            
         }
@@ -84,9 +86,11 @@ namespace ExportToService.Db
             var mDbConnection = GetSqLiteConnection();
             mDbConnection.Open();
 
-            SetCommand("INSERT INTO ErrorTransactions(TransactionID, CardID, TransactionType, Sum) VALUES ('" +
-                       transactionInfo.TransactionId + "', '" + transactionInfo.CardId + "', " +
-                       (int)transactionInfo.TypeBonus + ", " + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) + ")", mDbConnection);
+            SetCommand(
+                "INSERT INTO ErrorTransactions(TransactionID, CardID, TransactionType, Sum, TransactionDateTime) VALUES ('" +
+                transactionInfo.TransactionId + "', '" + transactionInfo.CardId + "', " +
+                (int) transactionInfo.TypeBonus + ", " + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
+                ", " + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + ")", mDbConnection);
 
             mDbConnection.Close();
         }        
