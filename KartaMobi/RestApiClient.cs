@@ -12,6 +12,9 @@ using RestSharp.Authenticators;
 
 namespace ExportToService.KartaMobi
 {
+    /// <summary>
+    /// Клиент Rest API Karta.Mobi
+    /// </summary>
     public class RestApiClient
     {
         private readonly string _bToken;
@@ -20,7 +23,7 @@ namespace ExportToService.KartaMobi
         private readonly DbSqlite _dbSqlite;
 
         /// <summary>
-        /// КлиентДляРаботыС_Karta.Mobi
+        /// Создать клиента Rest API Karta.Mobi
         /// </summary>
         public RestApiClient()
         {

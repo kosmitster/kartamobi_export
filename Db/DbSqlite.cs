@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using ExportToService.Dto;
 
 namespace ExportToService.Db
@@ -39,7 +37,7 @@ namespace ExportToService.Db
         /// <param name="sql">команда</param>
         /// <param name="mDbConnection">подключение</param>
         /// <returns></returns>
-        private IEnumerable<string> GetResultCommand(string sql, SQLiteConnection mDbConnection)
+        private List<string> GetResultCommand(string sql, SQLiteConnection mDbConnection)
         {
             var result = new List<string>();
             var command = new SQLiteCommand(sql, mDbConnection);
@@ -51,7 +49,7 @@ namespace ExportToService.Db
             }
             myReader.Close();
 
-            return result.AsEnumerable();
+            return result;
         }
 
         /// <summary>
@@ -125,7 +123,7 @@ namespace ExportToService.Db
         /// ПолучитьСписокСбойныхТранзакций
         /// </summary>
         /// <returns>Список сбойных транзакций</returns>
-        public IEnumerable<string> GetErrorTransactions()
+        public List<string> GetErrorTransactions()
         {
             var mDbConnection = GetSqLiteConnection();
             mDbConnection.Open();
