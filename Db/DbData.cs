@@ -56,8 +56,7 @@ namespace ExportToService.Db
 
             var paramBeginDate = testCmd.Parameters.Add("@BeginDate", SqlDbType.DateTime);
             paramBeginDate.Direction = ParameterDirection.Input;
-            //paramBeginDate.Value = DateTime.Now.AddMinutes(-5);
-            paramBeginDate.Value = new DateTime(2018, 04, 11);
+            paramBeginDate.Value = DateTime.Now.AddMinutes(-5);
 
             var myReader = testCmd.ExecuteReader();
             while (myReader.Read())
