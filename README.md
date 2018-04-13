@@ -13,16 +13,24 @@
 
 **Настройка**
 >Настройки программы находятся в файле ExportToService.exe.config	
+
 >><!--Настройки для получения данных-->
+
 >>>* DB_InitialCatalog = название MS SQL базы
 >>>* DB_dataSource = сервер MS SQL
 >>>* DB_login = логин MS SQL
 >>>* DB_password = пароль MS SQL
+
 >><!--Настройки для хранения лога-->
+
 >>>* LogFilePath = путь к лог файлу (с:\ExportToService)
+
 >><!--Настройки для записи данных-->
+
 >>>* SqliteFilePath = путь к файлу базы SQLite для хранения о успешных и сбойных пакетах
+
 >><!--Настройки для отправки данных-->
+
 >>>* KartaMobi_btoken = b_token клиента в Karta.Mobi
 >>>* KartaMobi_login = логин клиента в Karta.Mobi
 >>>* KartaMobi_password = пароль клиента в Karta.Mobi
