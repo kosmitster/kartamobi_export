@@ -35,7 +35,12 @@ namespace ExportToService.Dto
         /// <summary>
         /// Остаток на карте до выполнения транзакции
         /// </summary>
-        public decimal Balance { get; set; }
+        public decimal BalanceOnTransaction { get; set; }
+
+        /// <summary>
+        /// Остаток на карте на момент выполенения
+        /// </summary>
+        public decimal BalanceOnRealTime { get; set; }
 
         /// <summary>
         /// Тип транзакции

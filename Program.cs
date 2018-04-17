@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ExportToService.Db;
 using ExportToService.Dto;
 using ExportToService.KartaMobi;
@@ -15,18 +16,22 @@ namespace ExportToService
             {
                 LogWriter.Write(DateTime.Now + " ***Начало импорта***");
 
-                var restApiClient = new RestApiClient();
-
                 var dbData = new DbData();
 
+                var restApiClient = new RestApiClient(dbData);
+
+                var allTransactionForSession = dbData.GetTransactionFromDb(new DbSqlite().GetErrorTransactions());
+
                 //Обработать транзакции (в том числе "сбойные")
-                ProcessTransactions(dbData.GetTransactionFromDb(new DbSqlite().GetErrorTransactions()), restApiClient);
+                ProcessTransactions(allTransactionForSession, restApiClient);
+
+                restApiClient.CheckBalanceOnAllCard();
 
                 LogWriter.Write(DateTime.Now + " ***Окончание импорта***");
             }
             catch (Exception e)
             {
-                LogWriter.Write("[Error] " + e.Message);
+                LogWriter.Write("[Error] " + e.Message + " Stack = " + e.StackTrace);
             }
         }
 

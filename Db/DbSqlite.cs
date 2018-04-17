@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SQLite;
 using System.Globalization;
@@ -27,17 +28,18 @@ namespace ExportToService.Db
         /// <param name="mDbConnection">подключение</param>
         private static void SetCommand(string sql, SQLiteConnection mDbConnection)
         {
+            Log.LogWriter.Write("[SQL] " + sql);
             var command = new SQLiteCommand(sql, mDbConnection);
-            command.ExecuteNonQuery();
+            command.ExecuteNonQuery();            
         }
 
         /// <summary>
-        /// ПолучитьРезультатВыполненияКоманды
+        /// ПолучитьСписокТранзакций
         /// </summary>
         /// <param name="sql">команда</param>
         /// <param name="mDbConnection">подключение</param>
         /// <returns></returns>
-        private List<string> GetResultCommand(string sql, SQLiteConnection mDbConnection)
+        private List<string> GetFromDbErrorTransactions(string sql, SQLiteConnection mDbConnection)
         {
             var result = new List<string>();
             var command = new SQLiteCommand(sql, mDbConnection);
@@ -116,12 +118,16 @@ namespace ExportToService.Db
                 SetCommand(
                     "INSERT INTO ErrorTransactions(TransactionID, CardID, TransactionType, Sum, TransactionDateTime) VALUES ('" +
                     transactionInfo.TransactionId + "', '" + transactionInfo.CardId + "', " +
-                    (int) transactionInfo.TypeBonus + ", " +
-                    transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
-                    ", '" + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "')",
-                    mDbConnection);
+                    (int)transactionInfo.TypeBonus + ", " + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
+                    ", '" + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "')", mDbConnection);
 
                 mDbConnection.Close();
+            }
+            else
+            {
+                Log.LogWriter.Write(
+                    "[Continue] Сохранение сбойной транзакции пропущено, так как она уже есть в списке " +
+                    transactionInfo.TransactionId);
             }
         }
 
@@ -134,12 +140,59 @@ namespace ExportToService.Db
             var mDbConnection = GetSqLiteConnection();
             mDbConnection.Open();
 
-            var errorTransactions = GetResultCommand("SELECT TransactionID FROM ErrorTransactions", mDbConnection);
+            var errorTransactions = GetFromDbErrorTransactions("SELECT TransactionID FROM ErrorTransactions", mDbConnection);
 
             mDbConnection.Close();
 
             return errorTransactions;
         }
 
+        /// <summary>
+        /// ПолучитьСписокОтправленныхТранзакций
+        /// </summary>
+        /// <returns>Список отправленных транзакций</returns>
+        public List<string> GetSentTransactions()
+        {
+            var mDbConnection = GetSqLiteConnection();
+            mDbConnection.Open();
+
+            var errorTransactions = GetFromDbErrorTransactions("SELECT TransactionID FROM SentTransactions", mDbConnection);
+
+            mDbConnection.Close();
+
+            return errorTransactions;
+        }
+
+        /// <summary>
+        /// ПолучитьПоследнююДатуОтправки
+        /// </summary>
+        /// <returns>последняя дата отправки данных</returns>
+        public DateTime GetLatestSendDate()
+        {
+            var latesSendDateTime = new DateTime(2000,1,1);
+
+            var mDbConnection = GetSqLiteConnection();
+            mDbConnection.Open();
+
+
+            var command = new SQLiteCommand("SELECT MAX(TransactionDateTime) time FROM SentTransactions", mDbConnection);
+            var myReader = command.ExecuteReader();
+
+            while (myReader.Read())
+            {
+                if (myReader["time"] != DBNull.Value)
+                {
+                    latesSendDateTime =
+                        DateTime.ParseExact((string) myReader["time"], "yyyy-MM-dd HH:mm:ss.fff",
+                            CultureInfo.InvariantCulture);
+                    Log.LogWriter.Write("[Debug] Начало периода = " + latesSendDateTime);
+                }
+            }
+            myReader.Close();
+
+            mDbConnection.Close();
+
+            return latesSendDateTime;
+        }
     }
 }

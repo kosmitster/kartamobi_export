@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using ExportToService.Db;
 using ExportToService.Dto;
@@ -21,17 +23,23 @@ namespace ExportToService.KartaMobi
         private readonly string _login;
         private readonly string _password;
         private readonly DbSqlite _dbSqlite;
+        private readonly DbData _dbData;
+        private readonly List<BalanceInServiceInfo> _inServiceBalanses;
 
         /// <summary>
         /// Создать клиента Rest API Karta.Mobi
         /// </summary>
-        public RestApiClient()
+        /// <param name="dbData"></param>
+        public RestApiClient(DbData dbData)
         {
+            _dbData = dbData;
             _dbSqlite = new DbSqlite();
 
             _bToken = ConfigurationManager.AppSettings["KartaMobi_btoken"];
             _login = ConfigurationManager.AppSettings["KartaMobi_login"];
             _password = ConfigurationManager.AppSettings["KartaMobi_password"];
+
+            _inServiceBalanses = new List<BalanceInServiceInfo>();
         }
 
         /// <summary>
@@ -39,21 +47,24 @@ namespace ExportToService.KartaMobi
         /// </summary>
         /// <param name="balance">остаток на карте</param>
         /// <param name="uToken">токен клиента</param>
-        private void UpdateBalance(decimal balance, string uToken)
+        /// <param name="phoneNumber">номер телефона клиента</param>
+        private void UpdateBalance(decimal balance, string uToken, string phoneNumber)
         {
             if (!string.IsNullOrEmpty(uToken))
             {
                 var path = "/api/v1/client/balance";
                 var answer = ExecuteHttp(path, SerializeBalaceInfoBonus(balance, uToken));
-                if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
+                if (answer.StatusCode == HttpStatusCode.OK && (bool) JObject.Parse(answer.Content)["status"])
                 {
                     Log.LogWriter.Write(@"[OK] ПРЯМОЕ ОБНОВЛЕНИЕ БОНУСНОГО БАЛАНСА " + balance +
-                                        " - результат на сервере bonuses=" + (string) JObject.Parse(answer.Content)["data"]["bonuses"] +
-                                        " - результат на сервере delta=" + (string)JObject.Parse(answer.Content)["data"]["delta"]);
+                        " - телефон = " + phoneNumber +
+                        " - результат на сервере bonuses = " + (string) JObject.Parse(answer.Content)["data"]["bonuses"] +
+                        " - результат на сервере delta = " + (string) JObject.Parse(answer.Content)["data"]["delta"]);
                 }
                 else
                 {
-                    Log.LogWriter.Write(@"[Error] Ошибка ПРЯМОЕ ОБНОВЛЕНИЕ БОНУСНОГО БАЛАНСА " + answer.StatusCode + " " + answer.Content);
+                    Log.LogWriter.Write(@"[Error] Ошибка ПРЯМОЕ ОБНОВЛЕНИЕ БОНУСНОГО БАЛАНСА " + answer.StatusCode +
+                                        " " + answer.Content);
                 }
             }
         }
@@ -68,7 +79,7 @@ namespace ExportToService.KartaMobi
             string uToken = string.Empty;
             var path = "/api/v1/client/get-utoken-by-phone?" + "b_token=" + _bToken + "&" + "phone=" + phone;
             var answer = ExecuteHttp(path);
-            if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
+            if (answer.StatusCode == HttpStatusCode.OK && (bool) JObject.Parse(answer.Content)["status"])
             {
                 var data = JsonConvert.DeserializeObject<AnswerToken>(answer.Content).data;
                 uToken = data.u_token;
@@ -76,7 +87,8 @@ namespace ExportToService.KartaMobi
             }
             else
             {
-                Log.LogWriter.Write(@"[Error] Ошибка Получение U_TOKEN клиента по телефону " + answer.StatusCode + " " + answer.Content);
+                Log.LogWriter.Write(@"[Error] Ошибка Получение U_TOKEN клиента по телефону " + answer.StatusCode + " " +
+                                    answer.Content);
             }
 
             return uToken;
@@ -90,13 +102,14 @@ namespace ExportToService.KartaMobi
         {
             var path = "/api/v1/cards/number";
             var answer = ExecuteHttp(path, SerializeInfoCard(transactionInfo, uToken));
-            if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
+            if (answer.StatusCode == HttpStatusCode.OK && (bool) JObject.Parse(answer.Content)["status"])
             {
                 Log.LogWriter.Write(@"[OK] Обновление номера карты клиента " + transactionInfo.CardNumber);
             }
             else
             {
-                Log.LogWriter.Write(@"[Error] Ошибка Обновление номера карты клиента " + JObject.Parse(answer.Content)["status"]);
+                Log.LogWriter.Write(@"[Error] Ошибка Обновление номера карты клиента " +
+                                    JObject.Parse(answer.Content)["status"]);
             }
         }
 
@@ -111,22 +124,25 @@ namespace ExportToService.KartaMobi
             {
                 var path = "/api/v1/market/bonuses/force-accrual";
                 var answer = ExecuteHttp(path, SerializeMoveBonusInCard(transactionInfo, uToken));
-                if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
+                if (answer.StatusCode == HttpStatusCode.OK && (bool) JObject.Parse(answer.Content)["status"])
                 {
-                    Log.LogWriter.Write(@"[OK] Произведено начисление бонуса " + transactionInfo.PhoneNumber + 
-                        " на сумму " + transactionInfo.Amount + 
-                        " - на сервере bonuses = " + (string) JObject.Parse(answer.Content)["data"]["bonuses"]);
+                    Log.LogWriter.Write(@"[OK] Произведено начисление бонуса " + transactionInfo.PhoneNumber +
+                                        " на сумму " + transactionInfo.Amount +
+                                        " - на сервере bonuses = " +
+                                        (string) JObject.Parse(answer.Content)["data"]["bonuses"]);
                     _dbSqlite.SaveSentTransaction(transactionInfo);
-
+                    AddIntoServiceBalanceInfo(transactionInfo.PhoneNumber, transactionInfo.CardId, uToken,
+                        decimal.Parse((string) JObject.Parse(answer.Content)["data"]["bonuses"],
+                            new NumberFormatInfo {NumberDecimalSeparator = "."}));
                 }
                 else
                 {
-                    Log.LogWriter.Write(@"[Error] При начисленнии произошла ошибка телефон=" + transactionInfo.PhoneNumber +
-                                        " сумма=" + transactionInfo.Amount + 
-                                        " - сообщение сервиса=" + (string) JObject.Parse(answer.Content)["message"]);
                     _dbSqlite.SaveErrorTransaction(transactionInfo);
+                    Log.LogWriter.Write(@"[Error] При начисленнии произошла ошибка телефон=" +
+                                        transactionInfo.PhoneNumber +
+                                        " сумма=" + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture));
                 }
-                UpdateBalance(transactionInfo.Balance + transactionInfo.Amount, uToken);
+                UpdateBalance(transactionInfo.BalanceOnTransaction + transactionInfo.Amount, uToken, transactionInfo.PhoneNumber);
             }
         }
 
@@ -139,25 +155,54 @@ namespace ExportToService.KartaMobi
         {
             if (!string.IsNullOrEmpty(uToken))
             {
-                UpdateBalance(transactionInfo.Balance, uToken);
+                UpdateBalance(transactionInfo.BalanceOnTransaction, uToken, transactionInfo.PhoneNumber);
                 var path = "/api/v1/market/bonuses/force-writeoff";
                 var answer = ExecuteHttp(path, SerializeMoveBonusOutCard(transactionInfo, uToken));
-                if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
+                if (answer.StatusCode == HttpStatusCode.OK && (bool) JObject.Parse(answer.Content)["status"])
                 {
-                    Log.LogWriter.Write(@"[OK] Произведено списание бонуса " + transactionInfo.PhoneNumber + 
-                        " на сумму " + transactionInfo.Amount + 
-                        " - на сервере bonuses = " + (string) JObject.Parse(answer.Content)["data"]["bonuses"] +
-                        " - на сервере writeoff = " + (string) JObject.Parse(answer.Content)["data"]["writeoff"]);
+                    Log.LogWriter.Write(@"[OK] Произведено списание бонуса " + transactionInfo.PhoneNumber +
+                                        " на сумму " + transactionInfo.Amount +
+                                        " - на сервере bonuses = " +
+                                        (string) JObject.Parse(answer.Content)["data"]["bonuses"] +
+                                        " - на сервере writeoff = " +
+                                        (string) JObject.Parse(answer.Content)["data"]["writeoff"]);
                     _dbSqlite.SaveSentTransaction(transactionInfo);
+                    AddIntoServiceBalanceInfo(transactionInfo.PhoneNumber, transactionInfo.CardId, uToken,
+                        decimal.Parse((string) JObject.Parse(answer.Content)["data"]["bonuses"],
+                            new NumberFormatInfo {NumberDecimalSeparator = "."}));
                 }
                 else
                 {
-                    Log.LogWriter.Write(@"[Error] При списании произошла ошибка телефон=" + transactionInfo.PhoneNumber +
-                                        " сумма=" + transactionInfo.Amount + 
-                                        " - сообщение сервиса=" + (string) JObject.Parse(answer.Content)["message"]);
                     _dbSqlite.SaveErrorTransaction(transactionInfo);
-                }                
+                    Log.LogWriter.Write(@"[Error] При списании произошла ошибка телефон=" + transactionInfo.PhoneNumber +
+                        " сумма=" + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture));
+                }
             }
+        }
+
+
+        /// <summary>
+        /// Сохранить информацию о балансах Karta.Mobi
+        /// </summary>
+        /// <param name="phoneNumber">номер телефона</param>
+        /// <param name="cardId">уникальный идентификатор карты клиента</param>
+        /// <param name="uToken">токен клиента</param>
+        /// <param name="bonuses">количество бонусов</param>
+        private void AddIntoServiceBalanceInfo(string phoneNumber, string cardId, string uToken, decimal bonuses)
+        {
+            if (_inServiceBalanses.Any(x => x.CardId == cardId))
+            {
+                _inServiceBalanses.Remove(_inServiceBalanses.Single(x => x.CardId == cardId));
+            }
+
+            _inServiceBalanses.Add(new BalanceInServiceInfo
+            {
+                PhoneNumber = phoneNumber,
+                CardId = cardId,
+                Bonuses = bonuses,
+                UToken = uToken,
+                BalanceOnRealTime = _dbData.GetBalanceCardByOnRealTime(cardId)
+            });
         }
 
         /// <summary>
@@ -238,16 +283,47 @@ namespace ExportToService.KartaMobi
                 BaseUrl = new Uri("http://dev.karta.mobi"),
                 Authenticator = new HttpBasicAuthenticator(_login, _password)
             };
-            
+
             var request = new RestRequest(path);
             if (!string.IsNullOrEmpty(jsonBody))
             {
                 request.Method = Method.POST;
-                request.AddParameter("application/json; charset=utf-8",  jsonBody, ParameterType.RequestBody);
+                request.AddParameter("application/json; charset=utf-8", jsonBody, ParameterType.RequestBody);
             }
             request.AddHeader("Content-Type", "application/json");
 
             return client.Execute(request);
+        }
+
+        /// <summary>
+        /// Отправить все балансы карт если они не сходятся с информацией из Karta.Mobi
+        /// </summary>
+        public void CheckBalanceOnAllCard()
+        {
+            foreach (var balanceInServiceInfo in _inServiceBalanses)
+            {
+
+                if (balanceInServiceInfo.Bonuses != balanceInServiceInfo.BalanceOnRealTime)
+                {
+                    Log.LogWriter.Write("[Warning] Итоговая проверка баланса " +
+                                        " PhoneNumber = " + balanceInServiceInfo.PhoneNumber +
+                                        " CardID = " + balanceInServiceInfo.CardId +
+                                        " balanceInKartaMobi.Bonuses = " + balanceInServiceInfo.Bonuses +
+                                        " transactionInfo.BalanceOnRealTime = " +
+                                        balanceInServiceInfo.BalanceOnRealTime);
+                    UpdateBalance(balanceInServiceInfo.BalanceOnRealTime, balanceInServiceInfo.UToken,
+                        balanceInServiceInfo.PhoneNumber);
+                }
+                else
+                {
+                    Log.LogWriter.Write("[OK] Итоговая проверка баланса прошла успешно " +
+                                        " PhoneNumber = " + balanceInServiceInfo.PhoneNumber +
+                                        " CardID = " + balanceInServiceInfo.CardId +
+                                        " balanceInKartaMobi.Bonuses = " + balanceInServiceInfo.Bonuses +
+                                        " transactionInfo.BalanceOnRealTime = " +
+                                        balanceInServiceInfo.BalanceOnRealTime);
+                }
+            }
         }
     }
 }
