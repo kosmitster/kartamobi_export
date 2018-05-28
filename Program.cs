@@ -50,12 +50,15 @@ namespace ExportToService
                     if (!string.IsNullOrEmpty(uToken))
                     {
                         restApiClient.SetNumberCard(transaction, uToken);
-                        switch (transaction.TypeBonus)
+                        switch (transaction.TypeTransaction)
                         {
-                            case TypeBonus.InCard:
+                            case TypeTransaction.InCard:
                                 restApiClient.SetAmountInCard(transaction, uToken);
                                 break;
-                            case TypeBonus.OutCard:
+                            case TypeTransaction.AddToCard:
+                                restApiClient.SetAmountInCard(transaction, uToken);
+                                break;
+                            case TypeTransaction.OutCard:
                                 restApiClient.SetAmountOutCard(transaction, uToken);
                                 break;
                             default:

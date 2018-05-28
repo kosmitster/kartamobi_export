@@ -43,7 +43,8 @@ namespace ExportToService.Db
                 if(brokenTransactions != null)
                     transactions.AddRange(brokenTransactions.Select(brokenTransaction => GetTransaction(brokenTransaction, sqlConnection)));
 
-                transactions.AddRange(GetTransactions(sqlConnection));
+                foreach (TypeTransaction typeTransaction in Enum.GetValues(typeof(TypeTransaction)))
+                    transactions.AddRange(GetTransactions(sqlConnection, typeTransaction));
 
 
                 sqlConnection.Close();
@@ -90,7 +91,7 @@ namespace ExportToService.Db
                 result.TransactionId = (string) myReader["TransactionID"];
                 result.CardId = (string) myReader["CardID"];
                 result.Amount = (decimal) myReader["Sum"];
-                result.TypeBonus = (TypeBonus) myReader["TransactionType"];
+                result.TypeTransaction = (TypeTransaction) myReader["TransactionType"];
                 result.TransactionDateTime = (DateTime) myReader["TransactionDateTime"];
             }
             
@@ -108,47 +109,53 @@ namespace ExportToService.Db
         /// ПолучитьТранзакцииПоНачислениюИСписаниюБонусов
         /// </summary>
         /// <param name="sqlConnection">SQL подключение</param>
+        /// <param name="typeTransaction">Тип транзакции</param>
         /// <returns></returns>
-        private static IEnumerable<TransactionInfo> GetTransactions(SqlConnection sqlConnection)
+        private static IEnumerable<TransactionInfo> GetTransactions(SqlConnection sqlConnection,
+            TypeTransaction typeTransaction)
         {
             var exportData = new List<TransactionInfo>();
-            var testCmd = new SqlCommand
+            var storageProcedure = new SqlCommand
                 ("ds_GetTransactions", sqlConnection)
                 {CommandType = CommandType.StoredProcedure};
 
-            var retVal = testCmd.Parameters.Add("RetVal", SqlDbType.Int);
+            var retVal = storageProcedure.Parameters.Add("RetVal", SqlDbType.Int);
             retVal.Direction = ParameterDirection.ReturnValue;
 
             //@OrderBy
-            var paramOrderBy = testCmd.Parameters.Add("@OrderBy", SqlDbType.Int);
+            var paramOrderBy = storageProcedure.Parameters.Add("@OrderBy", SqlDbType.Int);
             paramOrderBy.Direction = ParameterDirection.Input;
             paramOrderBy.Value = 0;
 
             //@BeginDate
-            var paramBeginDate = testCmd.Parameters.Add("@BeginDate", SqlDbType.DateTime);
+            var paramBeginDate = storageProcedure.Parameters.Add("@BeginDate", SqlDbType.DateTime);
             paramBeginDate.Direction = ParameterDirection.Input;
-            paramBeginDate.Value = new DbSqlite().GetLatestSendDate();
+            paramBeginDate.Value = new DbSqlite().GetLatestSendDate(typeTransaction);
 
             //@RecordCount
-            var paramRecordCount = testCmd.Parameters.Add("@RecordCount", SqlDbType.Int);
+            var paramRecordCount = storageProcedure.Parameters.Add("@RecordCount", SqlDbType.Int);
             paramRecordCount.Direction = ParameterDirection.Input;
             paramRecordCount.Value = 10000;
 
-            var myReader = testCmd.ExecuteReader();
+            //@TransactionType
+            var paramTransactionType = storageProcedure.Parameters.Add("@TransactionType", SqlDbType.Int);
+            paramTransactionType.Direction = ParameterDirection.Input;
+            paramTransactionType.Value = (int) typeTransaction;
+
+
+            var myReader = storageProcedure.ExecuteReader();
             while (myReader.Read())
             {
-                //Если тип транзакции = "Начисление бонусов" или "Списание бонусов"
-                if ((int) myReader["TransactionType"] == 7 || (int) myReader["TransactionType"] == 2)
+
+                exportData.Add(new TransactionInfo
                 {
-                    exportData.Add(new TransactionInfo
-                    {
-                        TransactionId = (string) myReader["TransactionID"],
-                        CardId = (string) myReader["CardID"],
-                        Amount = (decimal) myReader["Sum"],
-                        TypeBonus = (TypeBonus) myReader["TransactionType"],
-                        TransactionDateTime = (DateTime) myReader["TransactionDateTime"]
-                    });
-                }
+                    TransactionId = (string) myReader["TransactionID"],
+                    CardId = (string) myReader["CardID"],
+                    Amount = (decimal) myReader["Sum"],
+                    TypeTransaction = (TypeTransaction) myReader["TransactionType"],
+                    TransactionDateTime = (DateTime) myReader["TransactionDateTime"]
+                });
+
             }
             myReader.Close();
 
@@ -157,7 +164,8 @@ namespace ExportToService.Db
             {
                 transactionInfo.CardNumber = GetCardNumberByCardId(sqlConnection, transactionInfo.CardId);
                 transactionInfo.PhoneNumber = GetPhoneByCard(sqlConnection, transactionInfo.CardNumber);
-                transactionInfo.BalanceOnTransaction = GetBalanceCardByTransactionId(sqlConnection, transactionInfo.TransactionId);
+                transactionInfo.BalanceOnTransaction =
+                    GetBalanceCardByTransactionId(sqlConnection, transactionInfo.TransactionId);
             }
 
             var copyExportData = new List<TransactionInfo>();
@@ -165,7 +173,7 @@ namespace ExportToService.Db
             //исключаю уже отправленные транзакции
             foreach (var info in exportData)
             {
-                if (!new DbSqlite().GetSentTransactions().Contains(info.TransactionId))
+                if (!new DbSqlite().GetSentTransactions(typeTransaction).Contains(info.TransactionId))
                 {
                     copyExportData.Add(info);
                 }
@@ -185,18 +193,18 @@ namespace ExportToService.Db
         {
             string phoneNumber = string.Empty;
 
-            var testCmd = new SqlCommand
+            var storageProcedure = new SqlCommand
                 ("ds_GetCardByCode", sqlConnection)
                 { CommandType = CommandType.StoredProcedure };
 
-            var retVal = testCmd.Parameters.Add("RetVal", SqlDbType.Int);
+            var retVal = storageProcedure.Parameters.Add("RetVal", SqlDbType.Int);
             retVal.Direction = ParameterDirection.ReturnValue;
 
-            var code = testCmd.Parameters.Add("@Code", SqlDbType.VarChar, 100);
+            var code = storageProcedure.Parameters.Add("@Code", SqlDbType.VarChar, 100);
             code.Direction = ParameterDirection.Input;
             code.Value = cardNumber;
 
-            var myReader = testCmd.ExecuteReader();
+            var myReader = storageProcedure.ExecuteReader();
             while (myReader.Read())
             {
                 phoneNumber = (string)myReader["PhoneNumber"];
@@ -216,18 +224,18 @@ namespace ExportToService.Db
         {
             string codeNumber = string.Empty;
 
-            var testCmd = new SqlCommand
+            var storageProcedure = new SqlCommand
                 ("ds_GetCard", sqlConnection)
                 { CommandType = CommandType.StoredProcedure };
 
-            var retVal = testCmd.Parameters.Add("RetVal", SqlDbType.Int);
+            var retVal = storageProcedure.Parameters.Add("RetVal", SqlDbType.Int);
             retVal.Direction = ParameterDirection.ReturnValue;
 
-            var cardId = testCmd.Parameters.Add("@CardID", SqlDbType.VarChar, 38);
+            var cardId = storageProcedure.Parameters.Add("@CardID", SqlDbType.VarChar, 38);
             cardId.Direction = ParameterDirection.Input;
             cardId.Value = idCard;
 
-            var myReader = testCmd.ExecuteReader();
+            var myReader = storageProcedure.ExecuteReader();
             while (myReader.Read())
             {
                 codeNumber = (string)myReader["Code"];
@@ -247,18 +255,18 @@ namespace ExportToService.Db
         {
             decimal balance = 0;
 
-            var testCmd = new SqlCommand
+            var storageProcedure = new SqlCommand
                 ("ds_GetTransaction", sqlConnection)
                 { CommandType = CommandType.StoredProcedure };
 
-            var retVal = testCmd.Parameters.Add("RetVal", SqlDbType.Int);
+            var retVal = storageProcedure.Parameters.Add("RetVal", SqlDbType.Int);
             retVal.Direction = ParameterDirection.ReturnValue;
 
-            var paramTransactionId = testCmd.Parameters.Add("@TransactionID", SqlDbType.VarChar, 38);
+            var paramTransactionId = storageProcedure.Parameters.Add("@TransactionID", SqlDbType.VarChar, 38);
             paramTransactionId.Direction = ParameterDirection.Input;
             paramTransactionId.Value = transactionId;
 
-            var myReader = testCmd.ExecuteReader();
+            var myReader = storageProcedure.ExecuteReader();
             while (myReader.Read())
             {
                 balance = (decimal)myReader["CardBalance"];
@@ -280,30 +288,30 @@ namespace ExportToService.Db
             var sqlConnection = GetSqlConnection();
             sqlConnection.Open();
 
-            var testCmd = new SqlCommand
+            var storageProcedure = new SqlCommand
                 ("ds_GetBalance", sqlConnection)
                 { CommandType = CommandType.StoredProcedure };
 
-            var retVal = testCmd.Parameters.Add("RetVal", SqlDbType.Int);
+            var retVal = storageProcedure.Parameters.Add("RetVal", SqlDbType.Int);
             retVal.Direction = ParameterDirection.ReturnValue;
 
-            var paramCardId = testCmd.Parameters.Add("@CardID", SqlDbType.VarChar, 38);
+            var paramCardId = storageProcedure.Parameters.Add("@CardID", SqlDbType.VarChar, 38);
             paramCardId.Direction = ParameterDirection.Input;
             paramCardId.Value = cardId;
 
-            var paramCode = testCmd.Parameters.Add("@Code", SqlDbType.VarChar, 100);
+            var paramCode = storageProcedure.Parameters.Add("@Code", SqlDbType.VarChar, 100);
             paramCode.Direction = ParameterDirection.Input;
             paramCode.Value = DBNull.Value;
 
-            var paramMode = testCmd.Parameters.Add("@Mode", SqlDbType.Int);
+            var paramMode = storageProcedure.Parameters.Add("@Mode", SqlDbType.Int);
             paramMode.Direction = ParameterDirection.Input;
             paramMode.Value = 0;
 
-            var paramWalletId = testCmd.Parameters.Add("@WalletID", SqlDbType.VarChar, 38);
+            var paramWalletId = storageProcedure.Parameters.Add("@WalletID", SqlDbType.VarChar, 38);
             paramWalletId.Direction = ParameterDirection.Input;
             paramWalletId.Value = DBNull.Value;
 
-            var myReader = testCmd.ExecuteReader();
+            var myReader = storageProcedure.ExecuteReader();
             while (myReader.Read())
             {
                 balance = (decimal)myReader["Balance"];

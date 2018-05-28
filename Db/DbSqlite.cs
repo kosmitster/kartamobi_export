@@ -97,7 +97,7 @@ namespace ExportToService.Db
             SetCommand(
                 "INSERT INTO SentTransactions(TransactionID, CardID, TransactionType, Sum, TransactionDateTime) VALUES ('" +
                 transactionInfo.TransactionId + "', '" + transactionInfo.CardId + "', " +
-                (int) transactionInfo.TypeBonus + ", " + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
+                (int) transactionInfo.TypeTransaction + ", " + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
                 ", '" + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "')", mDbConnection);
 
             mDbConnection.Close();            
@@ -118,7 +118,7 @@ namespace ExportToService.Db
                 SetCommand(
                     "INSERT INTO ErrorTransactions(TransactionID, CardID, TransactionType, Sum, TransactionDateTime) VALUES ('" +
                     transactionInfo.TransactionId + "', '" + transactionInfo.CardId + "', " +
-                    (int)transactionInfo.TypeBonus + ", " + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
+                    (int)transactionInfo.TypeTransaction + ", " + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
                     ", '" + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "')", mDbConnection);
 
                 mDbConnection.Close();
@@ -150,13 +150,14 @@ namespace ExportToService.Db
         /// <summary>
         /// ПолучитьСписокОтправленныхТранзакций
         /// </summary>
+        /// <param name="typeTransaction">Тип транзакции</param>
         /// <returns>Список отправленных транзакций</returns>
-        public List<string> GetSentTransactions()
+        public List<string> GetSentTransactions(TypeTransaction typeTransaction)
         {
             var mDbConnection = GetSqLiteConnection();
             mDbConnection.Open();
 
-            var errorTransactions = GetFromDbErrorTransactions("SELECT TransactionID FROM SentTransactions", mDbConnection);
+            var errorTransactions = GetFromDbErrorTransactions("SELECT TransactionID FROM SentTransactions WHERE TransactionType = " + (int) typeTransaction, mDbConnection);
 
             mDbConnection.Close();
 
@@ -166,8 +167,9 @@ namespace ExportToService.Db
         /// <summary>
         /// ПолучитьПоследнююДатуОтправки
         /// </summary>
+        /// <param name="typeTransaction">Тип транзакции</param>
         /// <returns>последняя дата отправки данных</returns>
-        public DateTime GetLatestSendDate()
+        public DateTime GetLatestSendDate(TypeTransaction typeTransaction)
         {
             var latesSendDateTime = new DateTime(2000,1,1);
 
@@ -175,7 +177,9 @@ namespace ExportToService.Db
             mDbConnection.Open();
 
 
-            var command = new SQLiteCommand("SELECT MAX(TransactionDateTime) time FROM SentTransactions", mDbConnection);
+            var command = new SQLiteCommand(
+                "SELECT MAX(TransactionDateTime) time FROM SentTransactions WHERE TransactionType = " + (int) typeTransaction,
+                mDbConnection);
             var myReader = command.ExecuteReader();
 
             while (myReader.Read())

@@ -38,14 +38,9 @@ namespace ExportToService.Dto
         public decimal BalanceOnTransaction { get; set; }
 
         /// <summary>
-        /// Остаток на карте на момент выполенения
-        /// </summary>
-        public decimal BalanceOnRealTime { get; set; }
-
-        /// <summary>
         /// Тип транзакции
         /// </summary>
-        public TypeBonus TypeBonus { get; set; }
+        public TypeTransaction TypeTransaction { get; set; }
 
         /// <summary>
         /// Дата и время транзакции
@@ -56,9 +51,10 @@ namespace ExportToService.Dto
     /// <summary>
     /// Тип транзакции {7 = Начисление; 2 = Списание}
     /// </summary>
-    public enum TypeBonus
+    public enum TypeTransaction
     {
         InCard = 7,
-        OutCard = 2
+        OutCard = 2,
+        AddToCard = 0
     }
 }
