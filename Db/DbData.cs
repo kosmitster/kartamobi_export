@@ -46,7 +46,6 @@ namespace ExportToService.Db
                 foreach (TypeTransaction typeTransaction in Enum.GetValues(typeof(TypeTransaction)))
                     transactions.AddRange(GetTransactions(sqlConnection, typeTransaction));
 
-
                 sqlConnection.Close();
             }
 

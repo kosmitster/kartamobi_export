@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.IO;
 
 namespace ExportToService.Log
@@ -11,6 +12,21 @@ namespace ExportToService.Log
         /// <param name="x">строка для записи</param>
         public static void Write(string x)
         {
+
+            if (x.Contains("[ERROR]"))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+            }
+            else if (x.Contains("[OK]"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+            }
+            else
+            {
+                Console.ResetColor();
+            }
+
+            Console.WriteLine(x);
             using (StreamWriter file =
                 new StreamWriter(ConfigurationManager.AppSettings["LogFilePath"] + @"\Log.txt", true))
             {
