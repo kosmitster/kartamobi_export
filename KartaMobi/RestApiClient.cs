@@ -283,7 +283,7 @@ namespace ExportToService.KartaMobi
         /// <returns></returns>
         private IRestResponse ExecuteHttp(string path, string jsonBody = null)
         {
-            System.Threading.Thread.Sleep(1500);
+            System.Threading.Thread.Sleep(1000);
             var client = new RestClient
             {
                 BaseUrl = new Uri("http://dev.karta.mobi"),
@@ -308,7 +308,6 @@ namespace ExportToService.KartaMobi
         {
             foreach (var balanceInServiceInfo in _inServiceBalanses)
             {
-
                 if (balanceInServiceInfo.Bonuses != balanceInServiceInfo.BalanceOnRealTime)
                 {
                     Log.LogWriter.Write("[Warning] Итоговая проверка баланса " +

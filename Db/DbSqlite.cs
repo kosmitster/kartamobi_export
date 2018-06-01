@@ -28,7 +28,7 @@ namespace ExportToService.Db
         /// <param name="mDbConnection">подключение</param>
         private static void SetCommand(string sql, SQLiteConnection mDbConnection)
         {
-            Log.LogWriter.Write("[SQL] " + sql);
+            //Log.LogWriter.Write("[SQL] " + sql);
             var command = new SQLiteCommand(sql, mDbConnection);
             command.ExecuteNonQuery();            
         }

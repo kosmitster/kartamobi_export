@@ -47,7 +47,7 @@ namespace ExportToService
                 if (!string.IsNullOrEmpty(transaction.PhoneNumber))
                 {
                     var uToken = restApiClient.GetUTokenClient(transaction.PhoneNumber);
-                    if (!string.IsNullOrEmpty(uToken))
+                    if (!string.IsNullOrEmpty(uToken) && transaction.CardNumber.Length <= 19 && transaction.Amount > 0)
                     {
                         restApiClient.SetNumberCard(transaction, uToken);
                         switch (transaction.TypeTransaction)
