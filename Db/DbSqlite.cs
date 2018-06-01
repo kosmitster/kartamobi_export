@@ -189,7 +189,7 @@ namespace ExportToService.Db
                     latesSendDateTime =
                         DateTime.ParseExact((string) myReader["time"], "yyyy-MM-dd HH:mm:ss.fff",
                             CultureInfo.InvariantCulture);
-                    Log.LogWriter.Write("[Debug] Начало периода = " + latesSendDateTime);
+                    Log.LogWriter.Write("[Debug] " + typeTransaction +" Начало периода = " + latesSendDateTime);
                 }
             }
             myReader.Close();

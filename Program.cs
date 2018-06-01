@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using ExportToService.Db;
 using ExportToService.Dto;
 using ExportToService.KartaMobi;
@@ -44,6 +43,7 @@ namespace ExportToService
         {
             foreach (var transaction in transactions)
             {
+                LogWriter.Write("[*] "+ transaction.CardNumber + " -----------------------------------------------------");
                 if (!string.IsNullOrEmpty(transaction.PhoneNumber))
                 {
                     var uToken = restApiClient.GetUTokenClient(transaction.PhoneNumber);

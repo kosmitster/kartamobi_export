@@ -43,8 +43,9 @@ namespace ExportToService.Db
                 if(brokenTransactions != null)
                     transactions.AddRange(brokenTransactions.Select(brokenTransaction => GetTransaction(brokenTransaction, sqlConnection)));
 
-                foreach (TypeTransaction typeTransaction in Enum.GetValues(typeof(TypeTransaction)))
-                    transactions.AddRange(GetTransactions(sqlConnection, typeTransaction));
+                transactions.AddRange(GetTransactions(sqlConnection, TypeTransaction.AddToCard));
+                transactions.AddRange(GetTransactions(sqlConnection, TypeTransaction.InCard));
+                transactions.AddRange(GetTransactions(sqlConnection, TypeTransaction.OutCard));
 
                 sqlConnection.Close();
             }

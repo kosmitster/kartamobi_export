@@ -87,8 +87,8 @@ namespace ExportToService.KartaMobi
             }
             else
             {
-                Log.LogWriter.Write(@"[ERROR] Ошибка Получение U_TOKEN клиента по телефону " + answer.StatusCode + " " +
-                                    answer.Content);
+                Log.LogWriter.Write(@"[ERROR] Ошибка Получение U_TOKEN клиента по телефону " + phone + " answer " +
+                                    JObject.Parse(answer.Content));
             }
 
             return uToken;
@@ -108,8 +108,9 @@ namespace ExportToService.KartaMobi
             }
             else
             {
-                Log.LogWriter.Write(@"[ERROR] Ошибка Обновление номера карты клиента " + answer.StatusCode + " " +
-                                    answer.Content);
+                Log.LogWriter.Write(@"[ERROR] Ошибка Обновление номера карты клиента " +
+                                    SerializeInfoCard(transactionInfo, uToken) + " answer" +
+                                    JObject.Parse(answer.Content));
             }
         }
 
@@ -138,8 +139,10 @@ namespace ExportToService.KartaMobi
                 else
                 {
                     _dbSqlite.SaveErrorTransaction(transactionInfo);
-                    Log.LogWriter.Write(@"[ERROR] При начисленнии произошла ошибка" + " телефон=" +
-                                        transactionInfo.PhoneNumber + " сумма=" + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture));
+                    Log.LogWriter.Write(@"[ERROR] При начисленнии произошла ошибка телефон=" +
+                                        transactionInfo.PhoneNumber + " сумма=" +
+                                        transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
+                                        JObject.Parse(answer.Content));
                 }
                 UpdateBalance(transactionInfo.BalanceOnTransaction + transactionInfo.Amount, uToken, transactionInfo.PhoneNumber);
             }
@@ -173,8 +176,10 @@ namespace ExportToService.KartaMobi
                 else
                 {
                     _dbSqlite.SaveErrorTransaction(transactionInfo);
-                    Log.LogWriter.Write(@"[ERROR] При списании произошла ошибка телефон=" + transactionInfo.PhoneNumber +
-                        " сумма=" + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture));
+                    Log.LogWriter.Write(@"[ERROR] При списании произошла ошибка телефон=" +
+                                        transactionInfo.PhoneNumber +
+                                        " сумма=" + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
+                                        JObject.Parse(answer.Content));
                 }
             }
         }
@@ -214,6 +219,7 @@ namespace ExportToService.KartaMobi
         {
             return JsonConvert.SerializeObject(new InfoBonusInCard
             {
+                order_id = "unknown",
                 b_token = _bToken,
                 u_token = uToken,
                 bonuses = transactionInfo.Amount.ToString(CultureInfo.InvariantCulture)
@@ -277,7 +283,7 @@ namespace ExportToService.KartaMobi
         /// <returns></returns>
         private IRestResponse ExecuteHttp(string path, string jsonBody = null)
         {
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(1500);
             var client = new RestClient
             {
                 BaseUrl = new Uri("http://dev.karta.mobi"),

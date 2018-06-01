@@ -21,6 +21,10 @@ namespace ExportToService.Log
             {
                 Console.ForegroundColor = ConsoleColor.Green;
             }
+            else if (x.Contains("[*]"))
+            {
+                Console.ForegroundColor = ConsoleColor.Blue;
+            }
             else
             {
                 Console.ResetColor();
