@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2035
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportToService", "Source\ExportToService\ExportToService.csproj", "{36267C7A-FE1E-4FF0-BE1F-8E71C2649554}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KartaMobiExporter", "Source\KartaMobiExporter\KartaMobiExporter.csproj", "{BB9A21A5-A39A-4CB6-9F95-8B1E7A034DEF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{36267C7A-FE1E-4FF0-BE1F-8E71C2649554}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36267C7A-FE1E-4FF0-BE1F-8E71C2649554}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36267C7A-FE1E-4FF0-BE1F-8E71C2649554}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36267C7A-FE1E-4FF0-BE1F-8E71C2649554}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB9A21A5-A39A-4CB6-9F95-8B1E7A034DEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB9A21A5-A39A-4CB6-9F95-8B1E7A034DEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB9A21A5-A39A-4CB6-9F95-8B1E7A034DEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB9A21A5-A39A-4CB6-9F95-8B1E7A034DEF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {83598697-26F3-43F1-9E83-785073F3CE5D}
+	EndGlobalSection
+EndGlobal
