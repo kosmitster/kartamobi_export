@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using KartaMobiExporter.Annotations;
-using KartaMobiExporter.Model;
+using KartaMobiExporter.Dto;
 using Prism.Commands;
 
 namespace KartaMobiExporter.Option

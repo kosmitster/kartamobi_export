@@ -10,7 +10,6 @@ namespace KartaMobiExporter
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-
         public MainWindowViewModel()
         {
             var version = Assembly.GetEntryAssembly().GetName().Version;

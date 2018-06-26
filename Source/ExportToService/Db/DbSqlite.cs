@@ -12,25 +12,36 @@ namespace ExportToService.Db
     {
         private readonly string _dbFileName;
 
-        /// <summary>
-        /// ПолучитьПодключение
-        /// </summary>
-        /// <returns></returns>
-        private SQLiteConnection GetSqLiteConnection()
-        {
-            return new SQLiteConnection("Data Source=" + _dbFileName + ";Version=3;");
-        }
+        internal const string commandCreateSentTransaction = @"CREATE TABLE IF NOT EXISTS SentTransactions 
+            (TransactionID [VARCHAR](38), CardID [VARCHAR](38), TransactionType [INT], Sum [DECIMAL](17,2), TransactionDateTime [DateTime])";
+        internal const string commandCreateErrorTransaction = @"CREATE TABLE IF NOT EXISTS ErrorTransactions 
+            (TransactionID [VARCHAR](38), CardID [VARCHAR](38), TransactionType [INT], Sum [DECIMAL](17,2), TransactionDateTime [DateTime])";
+        internal const string commandCreateTrigger = @"CREATE TRIGGER IF NOT EXISTS ErrorTransactionDisabled 
+            AFTER INSERT ON SentTransactions BEGIN DELETE FROM ErrorTransactions WHERE TransactionID = NEW.TransactionID; END;";
 
         /// <summary>
-        /// ВыполнитьКоммандуМолча
+        /// Конструктор {создаёт базу в случае если её нет и все потраха}
         /// </summary>
-        /// <param name="sql">команда</param>
-        /// <param name="mDbConnection">подключение</param>
-        private static void SetCommand(string sql, SQLiteConnection mDbConnection)
+        public DbSqlite()
         {
-            //Log.LogWriter.Write("[SQL] " + sql);
-            var command = new SQLiteCommand(sql, mDbConnection);
-            command.ExecuteNonQuery();            
+            _dbFileName = ConfigurationManager.AppSettings["SqliteFilePath"];
+
+            if (!File.Exists(_dbFileName))
+            {
+                SQLiteConnection.CreateFile(_dbFileName);
+
+                var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
+                mDbConnection.Open();
+
+                //Создать таблицу для успешно отправленных транзакций
+                AdapterSqlite.SetCommand(commandCreateSentTransaction, mDbConnection);
+                //Создать таблицу для сбойных транзакций
+                AdapterSqlite.SetCommand(commandCreateErrorTransaction, mDbConnection);
+                //Создать триггер для удаления сбойных транзакций в случае если транзакция успешно отправлена
+                AdapterSqlite.SetCommand(commandCreateTrigger, mDbConnection);
+
+                mDbConnection.Close();
+            }
         }
 
         /// <summary>
@@ -55,46 +66,15 @@ namespace ExportToService.Db
         }
 
         /// <summary>
-        /// Конструктор {создаёт базу в случае если её нет и все потраха}
-        /// </summary>
-        public DbSqlite()
-        {
-            _dbFileName = ConfigurationManager.AppSettings["SqliteFilePath"];
-
-            if (!File.Exists(_dbFileName))
-            {
-                SQLiteConnection.CreateFile(_dbFileName);
-
-                var mDbConnection = GetSqLiteConnection();
-                mDbConnection.Open();
-
-                //Создать таблицу для успешно отправленных транзакций
-                SetCommand(
-                    "CREATE TABLE IF NOT EXISTS SentTransactions (TransactionID [VARCHAR](38), CardID [VARCHAR](38), TransactionType [INT], Sum [DECIMAL](17,2), TransactionDateTime [DateTime])",
-                    mDbConnection);
-                //Создать таблицу для сбойных транзакций
-                SetCommand(
-                    "CREATE TABLE IF NOT EXISTS ErrorTransactions (TransactionID [VARCHAR](38), CardID [VARCHAR](38), TransactionType [INT], Sum [DECIMAL](17,2), TransactionDateTime [DateTime])",
-                    mDbConnection);
-                //Создать триггер для удаления сбойных транзакций в случае если транзакция успешно отправлена
-                SetCommand(
-                    "CREATE TRIGGER IF NOT EXISTS ErrorTransactionDisabled AFTER INSERT ON SentTransactions BEGIN DELETE FROM ErrorTransactions WHERE TransactionID = NEW.TransactionID; END;",
-                    mDbConnection);
-
-                mDbConnection.Close();
-            }
-        }
-
-        /// <summary>
         /// СохранитьУспешноОтправленныеТранзакции
         /// </summary>
         /// <param name="transactionInfo">Информация о транзакции</param>
         public void SaveSentTransaction(TransactionInfo transactionInfo)
         {
-            var mDbConnection = GetSqLiteConnection();
+            var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
             mDbConnection.Open();
 
-            SetCommand(
+            AdapterSqlite.SetCommand(
                 "INSERT INTO SentTransactions(TransactionID, CardID, TransactionType, Sum, TransactionDateTime) VALUES ('" +
                 transactionInfo.TransactionId + "', '" + transactionInfo.CardId + "', " +
                 (int) transactionInfo.TypeTransaction + ", " + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
@@ -112,10 +92,10 @@ namespace ExportToService.Db
             //Исключим добавление дублей
             if (!GetErrorTransactions().Contains(transactionInfo.TransactionId))
             {
-                var mDbConnection = GetSqLiteConnection();
+                var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
                 mDbConnection.Open();
 
-                SetCommand(
+                AdapterSqlite.SetCommand(
                     "INSERT INTO ErrorTransactions(TransactionID, CardID, TransactionType, Sum, TransactionDateTime) VALUES ('" +
                     transactionInfo.TransactionId + "', '" + transactionInfo.CardId + "', " +
                     (int)transactionInfo.TypeTransaction + ", " + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
@@ -137,7 +117,7 @@ namespace ExportToService.Db
         /// <returns>Список сбойных транзакций</returns>
         public List<string> GetErrorTransactions()
         {
-            var mDbConnection = GetSqLiteConnection();
+            var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
             mDbConnection.Open();
 
             var errorTransactions = GetFromDbErrorTransactions("SELECT TransactionID FROM ErrorTransactions", mDbConnection);
@@ -154,7 +134,7 @@ namespace ExportToService.Db
         /// <returns>Список отправленных транзакций</returns>
         public List<string> GetSentTransactions(TypeTransaction typeTransaction)
         {
-            var mDbConnection = GetSqLiteConnection();
+            var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
             mDbConnection.Open();
 
             var errorTransactions = GetFromDbErrorTransactions("SELECT TransactionID FROM SentTransactions WHERE TransactionType = " + (int) typeTransaction, mDbConnection);
@@ -173,7 +153,7 @@ namespace ExportToService.Db
         {
             var latesSendDateTime = new DateTime(2000,1,1);
 
-            var mDbConnection = GetSqLiteConnection();
+            var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
             mDbConnection.Open();
 
 

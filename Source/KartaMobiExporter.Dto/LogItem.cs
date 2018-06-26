@@ -1,4 +1,4 @@
-﻿namespace KartaMobiExporter.Model
+﻿namespace KartaMobiExporter.Dto
 {
     public class LogItem
     {

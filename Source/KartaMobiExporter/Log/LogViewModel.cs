@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using KartaMobiExporter.Annotations;
-using KartaMobiExporter.Model;
+using KartaMobiExporter.Dto;
 
 namespace KartaMobiExporter.Log
 {
