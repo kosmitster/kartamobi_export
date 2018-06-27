@@ -14,11 +14,15 @@
 	</PropertyGroup>
 		<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
 		<PlatformTarget>AnyCPU</PlatformTarget>
-		<DebugType>pdbonly</DebugType>
+		<DebugSymbols>false</DebugSymbols>
+		<DebugType>None</DebugType>
+		<GenerateDocumentation>false</GenerateDocumentation>
 		<Optimize>true</Optimize>
 		<OutputPath>$(SolutionDir)\Build\Release\$(MSBuildProjectName)\</OutputPath>
-		<DefineConstants>TRACE</DefineConstants>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-	</PropertyGroup>  
+		<AllowedReferenceRelatedFileExtensions>
+		<!-- Prevent default XML and PDB files copied to output in RELEASE. Only *.allowedextension files will be included, which doesn't exist in my case. -->
+			*.pdb;
+			*.xml
+		</AllowedReferenceRelatedFileExtensions>
+	</PropertyGroup>   
 </Project>  

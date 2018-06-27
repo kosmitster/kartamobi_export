@@ -8,6 +8,13 @@
     xmlns:utility="clr-namespace:KartaMobiExporter.Utility"
     d:DataContext="{d:DesignInstance {x:Type local:OptionViewModel}}"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style TargetType="Label">
+            <Setter Property="Foreground" Value="CadetBlue" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontStyle" Value="Italic" />
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -15,20 +22,28 @@
         </Grid.RowDefinitions>
 
         <TabControl Grid.Row="0" TabStripPlacement="Left">
-            <TabItem Header="SQL настройки">
+            <TabItem Header="Настройки DDS">
                 <StackPanel>
-                    <Label Content="путь к серверу sql" />
+                    <Label Content="Путь к серверу SQL" />
                     <TextBox Text="{Binding Option.DataSource}" />
-                    <Label Content="наименование sql базы данных" />
+                    <Label Content="Наименование sql базы данных" />
                     <TextBox Text="{Binding Option.InitialCatalog}" />
-                    <Label Content="логин" />
+                    <Label Content="Логин" />
                     <TextBox Text="{Binding Option.Login}" />
-                    <Label Content="пароль" />
+                    <Label Content="Пароль" />
                     <PasswordBox utility:PasswordHelper.Attach="True" utility:PasswordHelper.Password="{Binding Option.Password, Mode=TwoWay}" />
                 </StackPanel>
             </TabItem>
-            <TabItem Header="Ещё настройки" />
-            <TabItem Header="И ещё настройки" />
+            <TabItem Header="Настройки Karta.Mobi">
+                <StackPanel>
+                    <Label Content="BToken" />
+                    <TextBox Text="{Binding OptionKartaMobi.Btoken}" />
+                    <Label Content="Логин" />
+                    <TextBox Text="{Binding OptionKartaMobi.Login}" />
+                    <Label Content="Пароль" />
+                    <PasswordBox utility:PasswordHelper.Attach="True" utility:PasswordHelper.Password="{Binding OptionKartaMobi.Password, Mode=TwoWay}" />
+                </StackPanel>
+            </TabItem>
         </TabControl>
         <StackPanel Grid.Row="1">
             <Button Command="{Binding SaveCommand}" Content="Сохранить" />

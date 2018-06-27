@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
 using ExportToService.Dto;
+using KartaMobiExporter.Dto;
 
 namespace ExportToService.Db
 {
@@ -12,19 +12,27 @@ namespace ExportToService.Db
     {
         private readonly string _dbFileName;
 
-        internal const string commandCreateSentTransaction = @"CREATE TABLE IF NOT EXISTS SentTransactions 
+        /*Информация о транзакциях*/
+        internal const string CommandCreateSentTransaction = @"CREATE TABLE IF NOT EXISTS SentTransactions 
             (TransactionID [VARCHAR](38), CardID [VARCHAR](38), TransactionType [INT], Sum [DECIMAL](17,2), TransactionDateTime [DateTime])";
-        internal const string commandCreateErrorTransaction = @"CREATE TABLE IF NOT EXISTS ErrorTransactions 
+        internal const string CommandCreateErrorTransaction = @"CREATE TABLE IF NOT EXISTS ErrorTransactions 
             (TransactionID [VARCHAR](38), CardID [VARCHAR](38), TransactionType [INT], Sum [DECIMAL](17,2), TransactionDateTime [DateTime])";
-        internal const string commandCreateTrigger = @"CREATE TRIGGER IF NOT EXISTS ErrorTransactionDisabled 
+        internal const string CommandCreateTrigger = @"CREATE TRIGGER IF NOT EXISTS ErrorTransactionDisabled 
             AFTER INSERT ON SentTransactions BEGIN DELETE FROM ErrorTransactions WHERE TransactionID = NEW.TransactionID; END;";
+
+        /*Информация о настройках доступа к базе DDS*/
+        internal const string CommandCreateSqlOption = @"CREATE TABLE IF NOT EXISTS OptionDDS 
+            (InitialCatalog [VARCHAR](38), DataSource [VARCHAR](38), Login [VARCHAR](38), Password [VARCHAR](38))";
+        /*Информация о настройках доступа к Karta.Mobi*/
+        internal const string CommandCreateKartaMobiOption = @"CREATE TABLE IF NOT EXISTS OptionKartaMobi 
+            (Btoken [VARCHAR](38), Login [VARCHAR](38), Password [VARCHAR](38))";
 
         /// <summary>
         /// Конструктор {создаёт базу в случае если её нет и все потраха}
         /// </summary>
         public DbSqlite()
         {
-            _dbFileName = ConfigurationManager.AppSettings["SqliteFilePath"];
+            _dbFileName = AppDomain.CurrentDomain.BaseDirectory + "Db.sqlite";
 
             if (!File.Exists(_dbFileName))
             {
@@ -34,14 +42,115 @@ namespace ExportToService.Db
                 mDbConnection.Open();
 
                 //Создать таблицу для успешно отправленных транзакций
-                AdapterSqlite.SetCommand(commandCreateSentTransaction, mDbConnection);
+                AdapterSqlite.SetCommand(CommandCreateSentTransaction, mDbConnection);
                 //Создать таблицу для сбойных транзакций
-                AdapterSqlite.SetCommand(commandCreateErrorTransaction, mDbConnection);
+                AdapterSqlite.SetCommand(CommandCreateErrorTransaction, mDbConnection);
                 //Создать триггер для удаления сбойных транзакций в случае если транзакция успешно отправлена
-                AdapterSqlite.SetCommand(commandCreateTrigger, mDbConnection);
+                AdapterSqlite.SetCommand(CommandCreateTrigger, mDbConnection);
+
+                //Создать таблицу для хранения настройки доступа к базе DDS
+                AdapterSqlite.SetCommand(CommandCreateSqlOption, mDbConnection);
+                //Создать таблицу для хранения настройки доступа к Karta.Mobi
+                AdapterSqlite.SetCommand(CommandCreateKartaMobiOption, mDbConnection);
 
                 mDbConnection.Close();
             }
+        }
+
+        /// <summary>
+        /// Получить настройки доступа к базе DDS
+        /// </summary>
+        /// <returns></returns>
+        // ReSharper disable once InconsistentNaming
+        public OptionDDS GetOptionDDS()
+        {
+            var result = new OptionDDS();
+
+            var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
+            mDbConnection.Open();
+
+            var command = new SQLiteCommand("SELECT InitialCatalog, dataSource, login, password FROM OptionDDS LIMIT 1", mDbConnection);
+            var myReader = command.ExecuteReader();
+
+            while (myReader.Read())
+            {
+                result.InitialCatalog = (string)myReader["InitialCatalog"];
+                result.DataSource = (string)myReader["DataSource"];
+                result.Login = (string)myReader["Login"];
+                result.Password = (string)myReader["Password"];
+            }
+            myReader.Close();
+
+            mDbConnection.Close();
+
+            return result;
+        }
+
+        /// <summary>
+        /// Сохранить настроойки доступа к базе DDS
+        /// </summary>
+        // ReSharper disable once InconsistentNaming
+        public void SetOptionDDS(OptionDDS optionDDS)
+        {
+
+            var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
+            mDbConnection.Open();
+
+            //Удалить настройки
+            AdapterSqlite.SetCommand("DELETE FROM OptionDDS", mDbConnection);
+
+            //Сохранить новые настройки
+            AdapterSqlite.SetCommand(
+                "INSERT INTO OptionDDS(InitialCatalog, DataSource, Login, Password) VALUES ('" +
+                optionDDS.InitialCatalog + "', '" + optionDDS.DataSource + "', '" + optionDDS.Login + "', '" +
+                optionDDS.Password + "')", mDbConnection);
+
+            mDbConnection.Close();
+        }
+
+        /// <summary>
+        /// Получить настройки доступа к Karta.Mobi
+        /// </summary>
+        /// <returns></returns>
+        public OptionKartaMobi GetOptionKartaMobi()
+        {
+            var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
+            mDbConnection.Open();
+
+            var result = new OptionKartaMobi();
+            var command = new SQLiteCommand("SELECT Btoken, login, password FROM OptionKartaMobi LIMIT 1", mDbConnection);
+            var myReader = command.ExecuteReader();
+
+            while (myReader.Read())
+            {
+                result.Btoken = (string)myReader["Btoken"];
+                result.Login = (string)myReader["Login"];
+                result.Password = (string)myReader["Password"];
+            }
+            myReader.Close();
+
+            mDbConnection.Close();
+
+            return result;
+        }
+
+        /// <summary>
+        /// Сохранить настройки доступа к Karta.Mobi
+        /// </summary>
+        public void SetOptionKartaMobi(OptionKartaMobi optionKartaMobi)
+        {
+            var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
+            mDbConnection.Open();
+
+            //Удалить настройки
+            AdapterSqlite.SetCommand("DELETE FROM OptionKartaMobi", mDbConnection);
+
+            //Сохранить новые настройки
+            AdapterSqlite.SetCommand(
+                "INSERT INTO OptionKartaMobi(Btoken, Login, Password) VALUES ('" +
+                optionKartaMobi.Btoken + "', '" + optionKartaMobi.Login + "', '" + optionKartaMobi.Password + "')", mDbConnection);
+
+            mDbConnection.Close();
         }
 
         /// <summary>

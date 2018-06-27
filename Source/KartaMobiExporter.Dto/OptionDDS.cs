@@ -1,6 +1,10 @@
 ﻿namespace KartaMobiExporter.Dto
 {
-    public class OptionItem
+    /// <summary>
+    /// Настройки досутпа к базе DDS
+    /// </summary>
+    // ReSharper disable once InconsistentNaming
+    public class OptionDDS
     {
         /// <summary>
         /// наименование sql базы данных
