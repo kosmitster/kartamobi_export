@@ -1,8 +1,8 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Globalization;
 using System.Runtime.CompilerServices;
+using ExportToService.Db;
 using KartaMobiExporter.Annotations;
 using KartaMobiExporter.Dto;
 
@@ -10,21 +10,19 @@ namespace KartaMobiExporter.Log
 {
     public class LogViewModel : INotifyPropertyChanged, ITabViewModel
     {
+        readonly DbSqlite _dbSqlite;
+
         public LogViewModel()
         {
-
-            Items = new ObservableCollection<LogItem>();
-            Items.Add(new LogItem
-            {
-                Card = "123456",
-                Phone = "+79151407306",
-                Date = DateTime.Now.ToString(CultureInfo.InvariantCulture),
-                Amount = 500,
-                Result = "Отправлено"
-
-            });
+            _dbSqlite = new DbSqlite();
+            Items = new ObservableCollection<LogItem>(UpdateLogItem());
         }
 
+
+        private List<LogItem> UpdateLogItem()
+        {
+            return _dbSqlite.GetSentTransactions();
+        }
 
         private ObservableCollection<LogItem> _items;
         public ObservableCollection<LogItem> Items
@@ -34,7 +32,7 @@ namespace KartaMobiExporter.Log
             {
                 if (Equals(value, _items)) return;
                 _items = value;
-                OnPropertyChanged(nameof(Items));
+                OnPropertyChanged();
             }
         }
 
@@ -46,7 +44,7 @@ namespace KartaMobiExporter.Log
             {
                 if (value == _header) return;
                 _header = value;
-                OnPropertyChanged(nameof(Header));
+                OnPropertyChanged();
             }
         }
 

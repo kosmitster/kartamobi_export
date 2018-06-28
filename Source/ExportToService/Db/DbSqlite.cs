@@ -34,28 +34,59 @@ namespace ExportToService.Db
         {
             _dbFileName = AppDomain.CurrentDomain.BaseDirectory + "Db.sqlite";
 
-            if (!File.Exists(_dbFileName))
-            {
-                SQLiteConnection.CreateFile(_dbFileName);
 
-                var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
-                mDbConnection.Open();
+            if (!File.Exists(_dbFileName)) SQLiteConnection.CreateFile(_dbFileName);
 
-                //Создать таблицу для успешно отправленных транзакций
-                AdapterSqlite.SetCommand(CommandCreateSentTransaction, mDbConnection);
-                //Создать таблицу для сбойных транзакций
-                AdapterSqlite.SetCommand(CommandCreateErrorTransaction, mDbConnection);
-                //Создать триггер для удаления сбойных транзакций в случае если транзакция успешно отправлена
-                AdapterSqlite.SetCommand(CommandCreateTrigger, mDbConnection);
+            var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
+            mDbConnection.Open();
 
-                //Создать таблицу для хранения настройки доступа к базе DDS
-                AdapterSqlite.SetCommand(CommandCreateSqlOption, mDbConnection);
-                //Создать таблицу для хранения настройки доступа к Karta.Mobi
-                AdapterSqlite.SetCommand(CommandCreateKartaMobiOption, mDbConnection);
+            //Создать таблицу для успешно отправленных транзакций
+            AdapterSqlite.SetCommand(CommandCreateSentTransaction, mDbConnection);
+            //Создать таблицу для сбойных транзакций
+            AdapterSqlite.SetCommand(CommandCreateErrorTransaction, mDbConnection);
+            //Создать триггер для удаления сбойных транзакций в случае если транзакция успешно отправлена
+            AdapterSqlite.SetCommand(CommandCreateTrigger, mDbConnection);
 
-                mDbConnection.Close();
-            }
+            //Создать таблицу для хранения настройки доступа к базе DDS
+            AdapterSqlite.SetCommand(CommandCreateSqlOption, mDbConnection);
+            //Создать таблицу для хранения настройки доступа к Karta.Mobi
+            AdapterSqlite.SetCommand(CommandCreateKartaMobiOption, mDbConnection);
+
+            mDbConnection.Close();
         }
+
+        /// <summary>
+        /// Получить список транзакций
+        /// </summary>
+        /// <returns></returns>
+        public List<LogItem> GetSentTransactions()
+        {
+            var items = new List<LogItem>();
+
+            var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
+            mDbConnection.Open();
+
+            var command = new SQLiteCommand("SELECT * FROM SentTransactions Order By TransactionDateTime desc", mDbConnection);
+            var myReader = command.ExecuteReader();
+
+            while (myReader.Read())
+            {
+                items.Add(new LogItem
+                {
+                    Card = (string)myReader["CardID"],
+                    Phone = (string)myReader["CardID"],
+                    Amount = (decimal) myReader["Sum"],
+                    Date = ((DateTime)myReader["TransactionDateTime"]).ToString("dd.MM.yyyy HH:mm:ss"),
+                    Result = "Отправлено"
+                });
+            }
+            myReader.Close();
+            mDbConnection.Close();
+
+            return items;
+
+        }
+
 
         /// <summary>
         /// Получить настройки доступа к базе DDS
@@ -241,7 +272,7 @@ namespace ExportToService.Db
         /// </summary>
         /// <param name="typeTransaction">Тип транзакции</param>
         /// <returns>Список отправленных транзакций</returns>
-        public List<string> GetSentTransactions(TypeTransaction typeTransaction)
+        internal List<string> GetSentTransactions(TypeTransaction typeTransaction)
         {
             var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
             mDbConnection.Open();

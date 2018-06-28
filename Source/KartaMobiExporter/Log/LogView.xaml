@@ -18,7 +18,13 @@
                 <DataGridTextColumn Binding="{Binding Date}" Header="Дата и время" />
                 <DataGridTextColumn Binding="{Binding Card}" Header="Номер карты" />
                 <DataGridTextColumn Binding="{Binding Phone}" Header="Телефон" />
-                <DataGridTextColumn Binding="{Binding Amount}" Header="Сумма" />
+                <DataGridTextColumn Binding="{Binding Amount, StringFormat=\{0:N2\}}" Header="Сумма">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
                 <DataGridTextColumn Binding="{Binding Result}" Header="Результат" />
             </DataGrid.Columns>
         </DataGrid>
