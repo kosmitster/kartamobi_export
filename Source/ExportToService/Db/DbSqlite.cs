@@ -47,12 +47,59 @@ namespace ExportToService.Db
             //Создать триггер для удаления сбойных транзакций в случае если транзакция успешно отправлена
             AdapterSqlite.SetCommand(CommandCreateTrigger, mDbConnection);
 
+            //Добавляем дополнительные колонки в случае если их нет в базе
+            if (!IsFieldExist("SentTransactions", "Phone"))
+            {
+                AdapterSqlite.SetCommand("ALTER TABLE SentTransactions ADD COLUMN Phone [VARCHAR](15);", mDbConnection);
+            }
+            if (!IsFieldExist("SentTransactions", "Card"))
+            {
+                AdapterSqlite.SetCommand("ALTER TABLE SentTransactions ADD COLUMN Card [VARCHAR](15);", mDbConnection);
+            }
+            if (!IsFieldExist("ErrorTransactions", "Phone"))
+            {
+                AdapterSqlite.SetCommand("ALTER TABLE ErrorTransactions ADD COLUMN Phone [VARCHAR](15);", mDbConnection);
+            }
+            if (!IsFieldExist("ErrorTransactions", "Card"))
+            {
+                AdapterSqlite.SetCommand("ALTER TABLE ErrorTransactions ADD COLUMN Card [VARCHAR](15);", mDbConnection);
+            }
+
             //Создать таблицу для хранения настройки доступа к базе DDS
             AdapterSqlite.SetCommand(CommandCreateSqlOption, mDbConnection);
             //Создать таблицу для хранения настройки доступа к Karta.Mobi
             AdapterSqlite.SetCommand(CommandCreateKartaMobiOption, mDbConnection);
 
             mDbConnection.Close();
+        }
+
+        /// <summary>
+        /// Проверить есть ли у таблицы колонка
+        /// </summary>
+        /// <param name="tableName">Наименование таблицы</param>
+        /// <param name="fieldName">Наименование колонки</param>
+        /// <returns></returns>
+        public bool IsFieldExist(String tableName, String fieldName)
+        {
+            var isExist = false;
+            var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
+            mDbConnection.Open();
+
+            var command = new SQLiteCommand("PRAGMA table_info(" + tableName + ")", mDbConnection);
+            var myReader = command.ExecuteReader();
+
+            while (myReader.Read())
+            {
+                string currentColumn = (string) myReader[1];
+                if (currentColumn.Equals(fieldName))
+                {
+                    isExist = true;
+                }
+            }
+            myReader.Close();
+            mDbConnection.Close();
+
+            return isExist;
         }
 
         /// <summary>
