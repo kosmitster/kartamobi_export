@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
 using ExportToService.Db;
 using ExportToService.Dto;
 using ExportToService.KartaMobi;
@@ -7,8 +9,34 @@ using ExportToService.Log;
 
 namespace ExportToService
 {
-    class Program
+    public class Communication
     {
+
+        Timer timer;
+
+        /// <summary>
+        /// Запустить работу 
+        /// </summary>
+        public void Start()
+        {
+            TimerCallback timeCB = new TimerCallback(DoIt);
+
+            timer = new Timer(timeCB, null, 0, 1000);
+        }
+
+        /// <summary>
+        /// Остановить работу
+        /// </summary>
+        public void Stop()
+        {
+            timer.Change(Timeout.Infinite, Timeout.Infinite);
+        }
+
+        private void DoIt(object state)
+        {
+            Debug.WriteLine(DateTime.Now);
+        }
+
         static void Main()
         {
             try

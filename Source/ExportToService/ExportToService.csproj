@@ -62,7 +62,7 @@
     <Compile Include="JSON\InfoBonusOutCard.cs" />
     <Compile Include="JSON\InfoCardBonusBalance.cs" />
     <Compile Include="Log\LogWriter.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Communication.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="KartaMobi\RestApiClient.cs" />
   </ItemGroup>

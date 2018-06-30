@@ -24,6 +24,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="0.055*" />
         </Grid.RowDefinitions>
 
         <tb:TaskbarIcon
@@ -42,8 +43,8 @@
             Grid.Row="0"
             HorizontalAlignment="Center"
             Orientation="Horizontal">
-            <Button>Пуск</Button>
-            <Button>Стоп</Button>
+            <Button Content="Пуск" Command="{Binding StartCommand}"/>
+            <Button Content="Стоп" Command="{Binding StopCommand}"/>
         </StackPanel>
 
         <TabControl
@@ -66,7 +67,11 @@
                     <Setter Property="Header" Value="{Binding Header}" />
                 </Style>
             </TabControl.ItemContainerStyle>
-
         </TabControl>
+
+        <ProgressBar Grid.Row="3" Minimum="0" Maximum="100" Value="75"/>
+
+
+
     </Grid>
 </Window>

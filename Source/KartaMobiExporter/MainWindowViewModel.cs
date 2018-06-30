@@ -2,16 +2,22 @@
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using ExportToService;
 using KartaMobiExporter.Annotations;
 using KartaMobiExporter.Log;
 using KartaMobiExporter.Option;
+using Prism.Commands;
 
 namespace KartaMobiExporter
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
+        private Communication communication;
+
         public MainWindowViewModel()
         {
+            communication = new Communication();
+
             var version = Assembly.GetEntryAssembly().GetName().Version;
             Title = "Karta.Mobi exporter ver: " + version;
 
@@ -22,6 +28,15 @@ namespace KartaMobiExporter
             };
 
             SelectedTabViewModel = TabViewModels[0];
+
+            StartCommand = new DelegateCommand(() => {
+                communication.Start();
+            });
+
+            StopCommand = new DelegateCommand(() => {
+                communication.Stop();
+            });
+
         }
 
         private ITabViewModel _selectedTabViewModel;
@@ -59,6 +74,9 @@ namespace KartaMobiExporter
                 OnPropertyChanged();
             }
         }
+
+        public DelegateCommand StartCommand { get; set; }
+        public DelegateCommand StopCommand { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         [NotifyPropertyChangedInvocator]
