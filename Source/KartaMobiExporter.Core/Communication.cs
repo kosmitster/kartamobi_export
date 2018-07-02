@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using ExportToService.Db;
-using ExportToService.Dto;
-using ExportToService.KartaMobi;
-using ExportToService.Log;
+using KartaMobiExporter.Core.Db;
+using KartaMobiExporter.Core.Dto;
+using KartaMobiExporter.Core.KartaMobi;
+using KartaMobiExporter.Core.Log;
 
-namespace ExportToService
+namespace KartaMobiExporter.Core
 {
     public class Communication
     {

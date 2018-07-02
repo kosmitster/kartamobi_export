@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
-using ExportToService.Dto;
+using KartaMobiExporter.Core.Dto;
 using KartaMobiExporter.Dto;
 
-namespace ExportToService.Db
+namespace KartaMobiExporter.Core.Db
 {
     public class DbSqlite
     {

@@ -1,4 +1,4 @@
-﻿namespace ExportToService.JSON
+﻿namespace KartaMobiExporter.Core.JSON
 {
     public class InfoBonusCard
     {

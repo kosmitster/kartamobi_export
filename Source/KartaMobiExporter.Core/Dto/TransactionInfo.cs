@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ExportToService.Dto
+namespace KartaMobiExporter.Core.Dto
 {
     /// <summary>
     /// Информация о транзакции

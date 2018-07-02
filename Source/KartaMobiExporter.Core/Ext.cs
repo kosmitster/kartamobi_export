@@ -1,6 +1,6 @@
 ﻿using KartaMobiExporter.Dto;
 
-namespace ExportToService
+namespace KartaMobiExporter.Core
 {
     public static class Ext
     {

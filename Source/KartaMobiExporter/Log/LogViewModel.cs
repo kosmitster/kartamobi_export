@@ -2,8 +2,8 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using ExportToService.Db;
 using KartaMobiExporter.Annotations;
+using KartaMobiExporter.Core.Db;
 using KartaMobiExporter.Dto;
 
 namespace KartaMobiExporter.Log

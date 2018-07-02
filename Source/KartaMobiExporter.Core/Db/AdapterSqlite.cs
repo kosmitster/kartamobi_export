@@ -1,6 +1,6 @@
 ﻿using System.Data.SQLite;
 
-namespace ExportToService.Db
+namespace KartaMobiExporter.Core.Db
 {
     internal static class AdapterSqlite
     {

@@ -111,9 +111,9 @@
     <Resource Include="Icon\Roundicons-100-Free-Solid-Care-for-recycling.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)\Source\ExportToService\ExportToService.csproj">
+    <ProjectReference Include="..\KartaMobiExporter.Core\KartaMobiExporter.Core.csproj">
       <Project>{36267c7a-fe1e-4ff0-be1f-8e71c2649554}</Project>
-      <Name>ExportToService</Name>
+      <Name>KartaMobiExporter.Core</Name>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Source\KartaMobiExporter.Dto\KartaMobiExporter.Dto.csproj">
       <Project>{f24a6704-75db-45ff-a1d4-ebe9e0edc417}</Project>

@@ -9,8 +9,8 @@
     <ProjectGuid>{36267C7A-FE1E-4FF0-BE1F-8E71C2649554}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ExportToService</RootNamespace>
-    <AssemblyName>ExportToService</AssemblyName>
+    <RootNamespace>KartaMobiExporter.Core</RootNamespace>
+    <AssemblyName>KartaMobiExporter.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

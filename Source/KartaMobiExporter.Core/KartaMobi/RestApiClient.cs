@@ -4,15 +4,15 @@ using System.Configuration;
 using System.Globalization;
 using System.Linq;
 using System.Net;
-using ExportToService.Db;
-using ExportToService.Dto;
-using ExportToService.JSON;
+using KartaMobiExporter.Core.Db;
+using KartaMobiExporter.Core.Dto;
+using KartaMobiExporter.Core.JSON;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using RestSharp.Authenticators;
 
-namespace ExportToService.KartaMobi
+namespace KartaMobiExporter.Core.KartaMobi
 {
     /// <summary>
     /// Клиент Rest API Karta.Mobi

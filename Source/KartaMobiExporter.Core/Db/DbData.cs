@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using ExportToService.Dto;
+using KartaMobiExporter.Core.Dto;
 using KartaMobiExporter.Dto;
 
-namespace ExportToService.Db
+namespace KartaMobiExporter.Core.Db
 {
     /// <summary>
     /// Связист с ДДС

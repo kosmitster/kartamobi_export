@@ -1,4 +1,4 @@
-﻿namespace ExportToService.Dto
+﻿namespace KartaMobiExporter.Core.Dto
 {
     /// <summary>
     /// Информация о балансе Karta.Mobi

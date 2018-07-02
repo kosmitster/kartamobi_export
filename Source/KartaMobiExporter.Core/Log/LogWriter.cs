@@ -2,7 +2,7 @@
 using System.Configuration;
 using System.IO;
 
-namespace ExportToService.Log
+namespace KartaMobiExporter.Core.Log
 {
     public static class LogWriter
     {

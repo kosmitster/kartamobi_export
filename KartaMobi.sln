@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportToService", "Source\ExportToService\ExportToService.csproj", "{36267C7A-FE1E-4FF0-BE1F-8E71C2649554}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KartaMobiExporter.Core", "Source\KartaMobiExporter.Core\KartaMobiExporter.Core.csproj", "{36267C7A-FE1E-4FF0-BE1F-8E71C2649554}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KartaMobiExporter", "Source\KartaMobiExporter\KartaMobiExporter.csproj", "{BB9A21A5-A39A-4CB6-9F95-8B1E7A034DEF}"
 EndProject

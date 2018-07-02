@@ -2,9 +2,9 @@
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using ExportToService;
 using Hardcodet.Wpf.TaskbarNotification;
 using KartaMobiExporter.Annotations;
+using KartaMobiExporter.Core;
 using KartaMobiExporter.Log;
 using KartaMobiExporter.Option;
 using KartaMobiExporter.Properties;
