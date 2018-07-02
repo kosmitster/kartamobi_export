@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using ExportToService.Db;
 using ExportToService.Dto;
@@ -11,17 +10,30 @@ namespace ExportToService
 {
     public class Communication
     {
-
-        Timer timer;
+        Timer _timer;
+        DbSqlite _dbSqlite;
+        DbData _dbData;
 
         /// <summary>
         /// Запустить работу 
         /// </summary>
         public void Start()
         {
-            TimerCallback timeCB = new TimerCallback(DoIt);
+            _dbSqlite = new DbSqlite();
 
-            timer = new Timer(timeCB, null, 0, 1000);
+            var option = _dbSqlite.GetOptionDDS();
+            if (!option.IsWork())
+            {
+                   
+            }
+
+            _dbData = new DbData(_dbSqlite.GetOptionDDS());
+
+            
+
+            TimerCallback timeCb = DoIt;
+
+            _timer = new Timer(timeCb, null, 0, 10000);
         }
 
         /// <summary>
@@ -29,25 +41,18 @@ namespace ExportToService
         /// </summary>
         public void Stop()
         {
-            timer.Change(Timeout.Infinite, Timeout.Infinite);
+            _timer.Change(Timeout.Infinite, Timeout.Infinite);
         }
 
         private void DoIt(object state)
-        {
-            Debug.WriteLine(DateTime.Now);
-        }
-
-        static void Main()
         {
             try
             {
                 LogWriter.Write(DateTime.Now + " ***Начало импорта***");
 
-                var dbData = new DbData();
+                var restApiClient = new RestApiClient(_dbData);
 
-                var restApiClient = new RestApiClient(dbData);
-
-                var allTransactionForSession = dbData.GetTransactionFromDb(new DbSqlite().GetErrorTransactions());
+                var allTransactionForSession = _dbData.GetTransactionFromDb(new DbSqlite().GetErrorTransactions());
 
                 //Обработать транзакции (в том числе "сбойные")
                 ProcessTransactions(allTransactionForSession, restApiClient);

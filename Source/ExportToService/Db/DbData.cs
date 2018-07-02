@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using ExportToService.Dto;
+using KartaMobiExporter.Dto;
 
 namespace ExportToService.Db
 {
@@ -13,18 +14,11 @@ namespace ExportToService.Db
     /// </summary>
     public class DbData
     {
-        private readonly string _initCatalog;
-        private readonly string _dataSource;
-        private readonly string _login;
-        private readonly string _password;
+        // ReSharper disable once InconsistentNaming
+        private readonly OptionDDS _optionDDS;
 
-        public DbData()
-        {
-            _initCatalog = ConfigurationManager.AppSettings["DB_InitialCatalog"];
-            _dataSource = ConfigurationManager.AppSettings["DB_dataSource"];
-            _login = ConfigurationManager.AppSettings["DB_login"];
-            _password = ConfigurationManager.AppSettings["DB_password"];
-        }
+        // ReSharper disable once InconsistentNaming
+        public DbData(OptionDDS optionDDS) { _optionDDS = optionDDS; }
 
         /// <summary>
         /// ПолучитьДанныеОТранзакциях
@@ -57,11 +51,11 @@ namespace ExportToService.Db
         /// ПолучитьSQLПодключение
         /// </summary>
         /// <returns>подключение</returns>
-        private SqlConnection GetSqlConnection()
+        internal SqlConnection GetSqlConnection()
         {
-            return new SqlConnection(@"Integrated Security=True;Trusted_Connection=True;User ID=" + _login +
-                                     ";Password=" + _password + ";Initial Catalog=" + _initCatalog +
-                                     ";Data Source=" + _dataSource + ";");
+            return new SqlConnection(@"Integrated Security=True;Trusted_Connection=True;User ID=" + _optionDDS.Login +
+                                     ";Password=" + _optionDDS.Password + ";Initial Catalog=" + _optionDDS.InitialCatalog +
+                                     ";Data Source=" + _optionDDS.DataSource + ";");
         }
 
 
@@ -189,7 +183,7 @@ namespace ExportToService.Db
         /// <param name="sqlConnection">SQL подключение</param>
         /// <param name="cardNumber">номер карты</param>
         /// <returns></returns>
-        private static string GetPhoneByCard(SqlConnection sqlConnection, string cardNumber)
+        internal static string GetPhoneByCard(SqlConnection sqlConnection, string cardNumber)
         {
             string phoneNumber = string.Empty;
 

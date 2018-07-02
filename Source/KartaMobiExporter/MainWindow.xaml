@@ -13,6 +13,7 @@
     Height="450"
     d:DataContext="{d:DesignInstance {x:Type local:MainWindowViewModel}}"
     mc:Ignorable="d">
+
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Margin" Value="5" />
@@ -43,8 +44,8 @@
             Grid.Row="0"
             HorizontalAlignment="Center"
             Orientation="Horizontal">
-            <Button Content="Пуск" Command="{Binding StartCommand}"/>
-            <Button Content="Стоп" Command="{Binding StopCommand}"/>
+            <Button Command="{Binding StartCommand}" Content="Пуск" />
+            <Button Command="{Binding StopCommand}" Content="Стоп" />
         </StackPanel>
 
         <TabControl
@@ -69,9 +70,10 @@
             </TabControl.ItemContainerStyle>
         </TabControl>
 
-        <ProgressBar Grid.Row="3" Minimum="0" Maximum="100" Value="75"/>
-
-
-
+        <ProgressBar
+            Grid.Row="2"
+            Maximum="100"
+            Minimum="0"
+            Value="75" />
     </Grid>
 </Window>

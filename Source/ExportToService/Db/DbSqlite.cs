@@ -120,8 +120,9 @@ namespace ExportToService.Db
             {
                 items.Add(new LogItem
                 {
-                    Card = (string)myReader["CardID"],
-                    Phone = (string)myReader["CardID"],
+                    CardId = (string)myReader["CardID"],
+                    Phone = (string) (myReader["Phone"] == DBNull.Value ? string.Empty : myReader["Phone"]),
+                    Card = (string) (myReader["Card"] == DBNull.Value ? string.Empty : myReader["Card"]),
                     Amount = (decimal) myReader["Sum"],
                     Date = ((DateTime)myReader["TransactionDateTime"]).ToString("dd.MM.yyyy HH:mm:ss"),
                     Result = "Отправлено"
@@ -262,12 +263,14 @@ namespace ExportToService.Db
             mDbConnection.Open();
 
             AdapterSqlite.SetCommand(
-                "INSERT INTO SentTransactions(TransactionID, CardID, TransactionType, Sum, TransactionDateTime) VALUES ('" +
+                "INSERT INTO SentTransactions(TransactionID, CardID, TransactionType, Sum, TransactionDateTime, Phone, Card) VALUES ('" +
                 transactionInfo.TransactionId + "', '" + transactionInfo.CardId + "', " +
-                (int) transactionInfo.TypeTransaction + ", " + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
-                ", '" + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "')", mDbConnection);
+                (int) transactionInfo.TypeTransaction + ", " +
+                transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
+                ", '" + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "', '" +
+                transactionInfo.PhoneNumber + "', '" + transactionInfo.CardNumber + "')", mDbConnection);
 
-            mDbConnection.Close();            
+            mDbConnection.Close();
         }
 
         /// <summary>
@@ -283,10 +286,12 @@ namespace ExportToService.Db
                 mDbConnection.Open();
 
                 AdapterSqlite.SetCommand(
-                    "INSERT INTO ErrorTransactions(TransactionID, CardID, TransactionType, Sum, TransactionDateTime) VALUES ('" +
+                    "INSERT INTO ErrorTransactions(TransactionID, CardID, TransactionType, Sum, TransactionDateTime, Phone, Card) VALUES ('" +
                     transactionInfo.TransactionId + "', '" + transactionInfo.CardId + "', " +
-                    (int)transactionInfo.TypeTransaction + ", " + transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
-                    ", '" + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "')", mDbConnection);
+                    (int) transactionInfo.TypeTransaction + ", " +
+                    transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
+                    ", '" + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "', '" +
+                    transactionInfo.PhoneNumber + "', '" + transactionInfo.CardNumber + "')", mDbConnection);
 
                 mDbConnection.Close();
             }

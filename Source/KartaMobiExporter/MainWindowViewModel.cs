@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using ExportToService;
+using Hardcodet.Wpf.TaskbarNotification;
 using KartaMobiExporter.Annotations;
 using KartaMobiExporter.Log;
 using KartaMobiExporter.Option;
@@ -12,11 +13,13 @@ namespace KartaMobiExporter
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        private Communication communication;
+        private readonly Communication _communication;
+
+        private TaskbarIcon tb;
 
         public MainWindowViewModel()
         {
-            communication = new Communication();
+           _communication = new Communication();
 
             var version = Assembly.GetEntryAssembly().GetName().Version;
             Title = "Karta.Mobi exporter ver: " + version;
@@ -30,11 +33,11 @@ namespace KartaMobiExporter
             SelectedTabViewModel = TabViewModels[0];
 
             StartCommand = new DelegateCommand(() => {
-                communication.Start();
+                _communication.Start();
             });
 
             StopCommand = new DelegateCommand(() => {
-                communication.Stop();
+                _communication.Stop();
             });
 
         }
@@ -59,7 +62,7 @@ namespace KartaMobiExporter
             {
                 if (Equals(value, _tabViewModels)) return;
                 _tabViewModels = value;
-                OnPropertyChanged(nameof(TabViewModels));
+                OnPropertyChanged();
             }
         }
 
