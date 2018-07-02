@@ -28,7 +28,6 @@ namespace ExportToService
             }
 
             _dbData = new DbData(_dbSqlite.GetOptionDDS());
-
             
 
             TimerCallback timeCb = DoIt;

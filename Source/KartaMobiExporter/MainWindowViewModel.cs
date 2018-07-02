@@ -7,19 +7,19 @@ using Hardcodet.Wpf.TaskbarNotification;
 using KartaMobiExporter.Annotations;
 using KartaMobiExporter.Log;
 using KartaMobiExporter.Option;
+using KartaMobiExporter.Properties;
 using Prism.Commands;
 
 namespace KartaMobiExporter
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        private readonly Communication _communication;
-
-        private TaskbarIcon tb;
+        private const string NameProgram = "Karta.Mobi Exporter";
 
         public MainWindowViewModel()
         {
-           _communication = new Communication();
+            var tbi = new TaskbarIcon {Icon = Resources.Roundicons_100_Free_Solid_Care_for_recycling , ToolTipText = "Karta.Mobi Exporter"};
+            var communication = new Communication();
 
             var version = Assembly.GetEntryAssembly().GetName().Version;
             Title = "Karta.Mobi exporter ver: " + version;
@@ -33,11 +33,13 @@ namespace KartaMobiExporter
             SelectedTabViewModel = TabViewModels[0];
 
             StartCommand = new DelegateCommand(() => {
-                _communication.Start();
+                tbi.ShowBalloonTip(NameProgram, "Сервис запущен!", BalloonIcon.Info);
+                communication.Start();
             });
 
             StopCommand = new DelegateCommand(() => {
-                _communication.Stop();
+                tbi.ShowBalloonTip(NameProgram, "Сервис остановлен!", BalloonIcon.Info);
+                communication.Stop();
             });
 
         }

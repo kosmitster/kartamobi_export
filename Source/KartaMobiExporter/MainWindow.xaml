@@ -7,7 +7,6 @@
     xmlns:log="clr-namespace:KartaMobiExporter.Log"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:option="clr-namespace:KartaMobiExporter.Option"
-    xmlns:tb="http://www.hardcodet.net/taskbar"
     Title="{Binding Title}"
     Width="450"
     Height="450"
@@ -27,18 +26,6 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="0.055*" />
         </Grid.RowDefinitions>
-
-        <tb:TaskbarIcon
-            IconSource="/Icon/Roundicons-100-Free-Solid-Care-for-recycling.ico"
-            ToolTipText="Проверка"
-            Visibility="Visible">
-            <tb:TaskbarIcon.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="First Menu Item" />
-                    <MenuItem Header="Second Menu Item" />
-                </ContextMenu>
-            </tb:TaskbarIcon.ContextMenu>
-        </tb:TaskbarIcon>
 
         <StackPanel
             Grid.Row="0"
