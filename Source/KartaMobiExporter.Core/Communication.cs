@@ -1,18 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Timers;
+using KartaMobiExporter.Core.Annotations;
 using KartaMobiExporter.Core.Db;
 using KartaMobiExporter.Core.Dto;
 using KartaMobiExporter.Core.KartaMobi;
 using KartaMobiExporter.Core.Log;
+using KartaMobiExporter.Dto;
 
 namespace KartaMobiExporter.Core
 {
-    public class Communication
+    public class Communication : INotifyPropertyChanged
     {
-        Timer _timer;
+
+        Timer _timer = new Timer();
         DbSqlite _dbSqlite;
         DbData _dbData;
+
+        private OptionDDS _optionDDS;
+        private OptionKartaMobi _optionKartaMobi;
+
+        public Communication()
+        {
+            _timer.Elapsed += OnTimedEvent;
+            _timer.Interval = 5000;
+
+            State = EnumState.Disabled;
+        }
+
 
         /// <summary>
         /// Запустить работу 
@@ -21,18 +39,40 @@ namespace KartaMobiExporter.Core
         {
             _dbSqlite = new DbSqlite();
 
-            var option = _dbSqlite.GetOptionDDS();
-            if (!option.IsWork())
+            var _optionDDS = _dbSqlite.GetOptionDDS();
+            var _optionKartaMobi = _dbSqlite.GetOptionKartaMobi();
+            var restApiClient = new RestApiClient(_dbData, _optionKartaMobi);
+
+            //Проверяю все ли настройки заполнены
+            if (!_optionDDS.IsSettingCompleted() && !_optionKartaMobi.IsSettingCompleted())
             {
-                   
+                State = EnumState.ErrorOption;
+                return;
             }
 
             _dbData = new DbData(_dbSqlite.GetOptionDDS());
-            
+            //Проверяю возможность подключения к серверу DDS
+            if (!_dbData.CheckConnection())
+            {
+                State = EnumState.ErrorDDSConnection;
+                return;
+            }
 
-            TimerCallback timeCb = DoIt;
+            //Проверяю есть ли подключение к Karta.Mobi
+            if (!restApiClient.CheckConnection())
+            {
+                State = EnumState.ErrorKartaMobiConnection;
+                return;
+            }
 
-            _timer = new Timer(timeCb, null, 0, 10000);
+            _timer.Enabled = true;
+        }
+
+        private void OnTimedEvent(object sender, ElapsedEventArgs e)
+        {
+            State = EnumState.Start;
+            DoIt();
+            State = EnumState.Done;
         }
 
         /// <summary>
@@ -40,16 +80,19 @@ namespace KartaMobiExporter.Core
         /// </summary>
         public void Stop()
         {
-            _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            _timer.Enabled = false;
+
+            State = EnumState.Stop;
         }
 
-        private void DoIt(object state)
+
+        private void DoIt()
         {
             try
             {
                 LogWriter.Write(DateTime.Now + " ***Начало импорта***");
 
-                var restApiClient = new RestApiClient(_dbData);
+                var restApiClient = new RestApiClient(_dbData, _optionKartaMobi);
 
                 var allTransactionForSession = _dbData.GetTransactionFromDb(new DbSqlite().GetErrorTransactions());
 
@@ -71,11 +114,12 @@ namespace KartaMobiExporter.Core
         /// </summary>
         /// <param name="transactions">список транзакций</param>
         /// <param name="restApiClient">клиент Rest API Karta.Mobi</param>
-        private static void ProcessTransactions(List<TransactionInfo> transactions, RestApiClient restApiClient)
+        private static void ProcessTransactions(IEnumerable<TransactionInfo> transactions, RestApiClient restApiClient)
         {
             foreach (var transaction in transactions)
             {
-                LogWriter.Write("[*] "+ transaction.CardNumber + " -----------------------------------------------------");
+                LogWriter.Write("[*] " + transaction.CardNumber +
+                                " -----------------------------------------------------");
                 if (!string.IsNullOrEmpty(transaction.PhoneNumber))
                 {
                     var uToken = restApiClient.GetUTokenClient(transaction.PhoneNumber);
@@ -107,6 +151,39 @@ namespace KartaMobiExporter.Core
                     LogWriter.Write("[Error] Не привязан номер телефона к карте " + transaction.CardNumber);
                 }
             }
+        }
+
+        public enum EnumState
+        {
+            Disabled,
+            Start,
+            Done,
+            Stop,
+            ErrorOption,
+            ErrorDDSConnection,
+            ErrorKartaMobiConnection,
+            ErrorRunTime
+        }
+
+        private EnumState _state;
+
+        public EnumState State
+        {
+            get => _state;
+            set
+            {
+                if (value == _state) return;
+                _state = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

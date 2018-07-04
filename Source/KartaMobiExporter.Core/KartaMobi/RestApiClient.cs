@@ -7,6 +7,7 @@ using System.Net;
 using KartaMobiExporter.Core.Db;
 using KartaMobiExporter.Core.Dto;
 using KartaMobiExporter.Core.JSON;
+using KartaMobiExporter.Dto;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
@@ -30,16 +31,35 @@ namespace KartaMobiExporter.Core.KartaMobi
         /// Создать клиента Rest API Karta.Mobi
         /// </summary>
         /// <param name="dbData"></param>
-        public RestApiClient(DbData dbData)
+        /// <param name="optionKartaMobi"></param>
+        public RestApiClient(DbData dbData, OptionKartaMobi optionKartaMobi)
         {
             _dbData = dbData;
             _dbSqlite = new DbSqlite();
 
-            _bToken = ConfigurationManager.AppSettings["KartaMobi_btoken"];
-            _login = ConfigurationManager.AppSettings["KartaMobi_login"];
-            _password = ConfigurationManager.AppSettings["KartaMobi_password"];
+            _bToken = optionKartaMobi.Btoken;
+            _login = optionKartaMobi.Login;
+            _password = optionKartaMobi.Password;
 
             _inServiceBalanses = new List<BalanceInServiceInfo>();
+        }
+
+        /// <summary>
+        /// Проверить подключение к Karta.mobi
+        /// </summary>
+        /// <returns>Удачно ли подключение?</returns>
+        public bool CheckConnection()
+        {
+            bool result = false;
+
+            var path = "/api/v1/validate-login-data?" + "b_token=" + _bToken + "&" + "phone=" + _login + "&" + "password=" + _password;
+            var answer = ExecuteHttp(path);
+            if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
+            {
+                result = true;
+            }
+
+            return result;
         }
 
         /// <summary>

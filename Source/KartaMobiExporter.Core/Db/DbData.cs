@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using KartaMobiExporter.Core.Dto;
 using KartaMobiExporter.Dto;
@@ -18,6 +19,37 @@ namespace KartaMobiExporter.Core.Db
 
         // ReSharper disable once InconsistentNaming
         public DbData(OptionDDS optionDDS) { _optionDDS = optionDDS; }
+
+        /// <summary>
+        /// Проверить подключение к серверу DDS
+        /// </summary>
+        /// <returns>Удачно ли подключение?</returns>
+        public bool CheckConnection()
+        {
+            bool result = false;
+
+            try
+            {
+                using (var sqlConnection = GetSqlConnection())
+                {
+                    sqlConnection.Open();
+
+                    var command = new SqlCommand("SELECT 1", sqlConnection);
+                    var reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        result = Convert.ToBoolean (reader[0]);
+                    }
+                    reader.Close();
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);                
+            }
+            return result;
+        }
 
         /// <summary>
         /// ПолучитьДанныеОТранзакциях
@@ -56,8 +88,7 @@ namespace KartaMobiExporter.Core.Db
                                      ";Password=" + _optionDDS.Password + ";Initial Catalog=" + _optionDDS.InitialCatalog +
                                      ";Data Source=" + _optionDDS.DataSource + ";");
         }
-
-
+        
         /// <summary>
         /// ПолучитьТранзакциюПоID
         /// </summary>

@@ -14,11 +14,11 @@ namespace KartaMobiExporter
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        private const string NameProgram = "Karta.Mobi Exporter";
+        private readonly TaskbarIcon _taskbarIcon;
 
         public MainWindowViewModel()
         {
-            var tbi = new TaskbarIcon {Icon = Resources.Roundicons_100_Free_Solid_Care_for_recycling , ToolTipText = "Karta.Mobi Exporter"};
+            _taskbarIcon = new TaskbarIcon {Icon = Resources.Roundicons_100_Free_Solid_Care_for_recycling , ToolTipText = "Karta.Mobi Exporter"};
             var communication = new Communication();
 
             var version = Assembly.GetEntryAssembly().GetName().Version;
@@ -33,16 +33,45 @@ namespace KartaMobiExporter
             SelectedTabViewModel = TabViewModels[0];
 
             StartCommand = new DelegateCommand(() => {
-                tbi.ShowBalloonTip(NameProgram, "Сервис запущен!", BalloonIcon.Info);
                 communication.Start();
             });
 
             StopCommand = new DelegateCommand(() => {
-                tbi.ShowBalloonTip(NameProgram, "Сервис остановлен!", BalloonIcon.Info);
                 communication.Stop();
             });
 
+            communication.PropertyChanged += (sender, args) =>
+            {
+                if (args.PropertyName == "State")
+                {
+                    Notify(((Communication)sender).State);
+                }
+            };
+
         }
+
+        private void Notify(Communication.EnumState state)
+        {
+            switch (state)
+            {
+                case Communication.EnumState.ErrorOption:
+                    _taskbarIcon.ShowBalloonTip(Title, "Выполните настройку!", BalloonIcon.Error);
+                    break;
+                case Communication.EnumState.ErrorDDSConnection:
+                    _taskbarIcon.ShowBalloonTip(Title, "Ошибка подключения к серверу DDS!", BalloonIcon.Error);
+                    break;
+                case Communication.EnumState.ErrorKartaMobiConnection:
+                    _taskbarIcon.ShowBalloonTip(Title, "Ошибка подключения к Karta.Mobi!", BalloonIcon.Error);
+                    break;
+                case Communication.EnumState.Done:
+                    _taskbarIcon.ShowBalloonTip(Title, "Синхронизация выполнена!", BalloonIcon.Error);
+                    break;
+                default:
+                    _taskbarIcon.ShowBalloonTip(Title, state.ToString(), BalloonIcon.Info);
+                    break;
+            }            
+        }
+
 
         private ITabViewModel _selectedTabViewModel;
         public ITabViewModel SelectedTabViewModel
