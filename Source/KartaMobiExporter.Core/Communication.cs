@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Timers;
 using KartaMobiExporter.Core.Annotations;
@@ -15,10 +14,9 @@ namespace KartaMobiExporter.Core
 {
     public class Communication : INotifyPropertyChanged
     {
-
-        Timer _timer = new Timer();
-        DbSqlite _dbSqlite;
-        DbData _dbData;
+        private readonly Timer _timer = new Timer();
+        private DbSqlite _dbSqlite;
+        private DbData _dbData;
 
         private OptionDDS _optionDDS;
         private OptionKartaMobi _optionKartaMobi;
@@ -39,8 +37,8 @@ namespace KartaMobiExporter.Core
         {
             _dbSqlite = new DbSqlite();
 
-            var _optionDDS = _dbSqlite.GetOptionDDS();
-            var _optionKartaMobi = _dbSqlite.GetOptionKartaMobi();
+            _optionDDS = _dbSqlite.GetOptionDDS();
+            _optionKartaMobi = _dbSqlite.GetOptionKartaMobi();
             var restApiClient = new RestApiClient(_dbData, _optionKartaMobi);
 
             //Проверяю все ли настройки заполнены

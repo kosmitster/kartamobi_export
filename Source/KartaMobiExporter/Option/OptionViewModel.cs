@@ -7,9 +7,9 @@ using Prism.Commands;
 
 namespace KartaMobiExporter.Option
 {
-    public class OptionViewModel : INotifyPropertyChanged, ITabViewModel
+    public class OptionViewModel : INotifyPropertyChanged
     {
-        readonly DbSqlite _dbSqlite;
+        private readonly DbSqlite _dbSqlite;
         public OptionViewModel()
         {
             _dbSqlite = new DbSqlite();

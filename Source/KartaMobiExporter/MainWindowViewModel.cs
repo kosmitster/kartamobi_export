@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Hardcodet.Wpf.TaskbarNotification;
@@ -24,13 +23,8 @@ namespace KartaMobiExporter
             var version = Assembly.GetEntryAssembly().GetName().Version;
             Title = "Karta.Mobi exporter ver: " + version;
 
-            TabViewModels = new ObservableCollection<ITabViewModel>
-            {
-                new OptionViewModel {Header = "Настройки"},
-                new LogViewModel {Header = "Журнал"}
-            };
-
-            SelectedTabViewModel = TabViewModels[0];
+            OptionViewModel = new OptionViewModel();
+            LogViewModel = new LogViewModel();
 
             StartCommand = new DelegateCommand(() => {
                 communication.Start();
@@ -44,12 +38,19 @@ namespace KartaMobiExporter
             {
                 if (args.PropertyName == "State")
                 {
+                    //Оповещаю при изменении состояния
                     Notify(((Communication)sender).State);
+                    //Если синхронизация выполнена обновляю логи
+                    if (((Communication) sender).State == Communication.EnumState.Done)
+                        LogViewModel.UpdateLogItem();
                 }
             };
-
         }
 
+        /// <summary>
+        /// Оповестить в System Tray 
+        /// </summary>
+        /// <param name="state">Состояние</param>
         private void Notify(Communication.EnumState state)
         {
             switch (state)
@@ -72,30 +73,30 @@ namespace KartaMobiExporter
             }            
         }
 
-
-        private ITabViewModel _selectedTabViewModel;
-        public ITabViewModel SelectedTabViewModel
+        private LogViewModel _logViewModel;
+        public LogViewModel LogViewModel
         {
-            get => _selectedTabViewModel;
+            get => _logViewModel;
             set
             {
-                if (Equals(value, _selectedTabViewModel)) return;
-                _selectedTabViewModel = value;
+                if (Equals(value, _logViewModel)) return;
+                _logViewModel = value;
                 OnPropertyChanged();
             }
         }
 
-        private ObservableCollection<ITabViewModel> _tabViewModels;
-        public ObservableCollection<ITabViewModel> TabViewModels
+        private OptionViewModel _optionViewModel;
+        public OptionViewModel OptionViewModel
         {
-            get => _tabViewModels;
+            get => _optionViewModel;
             set
             {
-                if (Equals(value, _tabViewModels)) return;
-                _tabViewModels = value;
+                if (Equals(value, _optionViewModel)) return;
+                _optionViewModel = value;
                 OnPropertyChanged();
             }
         }
+
 
         private string _title;
         public string Title

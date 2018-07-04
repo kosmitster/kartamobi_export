@@ -35,26 +35,13 @@
             <Button Command="{Binding StopCommand}" Content="Стоп" />
         </StackPanel>
 
-        <TabControl
-            x:Name="MyTabControl"
-            Grid.Row="1"
-            ItemsSource="{Binding TabViewModels}"
-            SelectedItem="{Binding SelectedTabViewModel}">
-
-            <TabControl.Resources>
-                <DataTemplate DataType="{x:Type option:OptionViewModel}">
-                    <option:OptionView />
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type log:LogViewModel}">
-                    <log:LogView />
-                </DataTemplate>
-            </TabControl.Resources>
-
-            <TabControl.ItemContainerStyle>
-                <Style TargetType="TabItem">
-                    <Setter Property="Header" Value="{Binding Header}" />
-                </Style>
-            </TabControl.ItemContainerStyle>
+        <TabControl Grid.Row="1" TabStripPlacement="Top">
+            <TabItem Header="Настройки">
+                <option:OptionView DataContext="{Binding DataContext.OptionViewModel, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+            </TabItem>
+            <TabItem Header="Log">
+                <log:LogView DataContext="{Binding DataContext.LogViewModel, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+            </TabItem>
         </TabControl>
 
         <ProgressBar

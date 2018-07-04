@@ -8,9 +8,9 @@ using KartaMobiExporter.Dto;
 
 namespace KartaMobiExporter.Log
 {
-    public class LogViewModel : INotifyPropertyChanged, ITabViewModel
+    public class LogViewModel : INotifyPropertyChanged
     {
-        readonly DbSqlite _dbSqlite;
+        private readonly DbSqlite _dbSqlite;
 
         public LogViewModel()
         {
@@ -19,7 +19,7 @@ namespace KartaMobiExporter.Log
         }
 
 
-        private List<LogItem> UpdateLogItem()
+        internal List<LogItem> UpdateLogItem()
         {
             return _dbSqlite.GetSentTransactions();
         }

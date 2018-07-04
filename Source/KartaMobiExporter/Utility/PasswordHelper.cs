@@ -53,13 +53,16 @@ namespace KartaMobiExporter.Utility
             DependencyPropertyChangedEventArgs e)
         {
             PasswordBox passwordBox = sender as PasswordBox;
-            passwordBox.PasswordChanged -= PasswordChanged;
-
-            if (!(bool)GetIsUpdating(passwordBox))
+            if (passwordBox != null)
             {
-                passwordBox.Password = (string)e.NewValue;
+                passwordBox.PasswordChanged -= PasswordChanged;
+
+                if (!(bool)GetIsUpdating(passwordBox))
+                {
+                    passwordBox.Password = (string)e.NewValue;
+                }
+                passwordBox.PasswordChanged += PasswordChanged;
             }
-            passwordBox.PasswordChanged += PasswordChanged;
         }
 
         private static void Attach(DependencyObject sender,
