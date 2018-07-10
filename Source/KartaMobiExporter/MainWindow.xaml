@@ -11,6 +11,7 @@
     Width="450"
     Height="450"
     d:DataContext="{d:DesignInstance {x:Type local:MainWindowViewModel}}"
+    Icon="pack://application:,,,/Resources/FreeIconExample.ico"
     mc:Ignorable="d">
 
     <Window.Resources>

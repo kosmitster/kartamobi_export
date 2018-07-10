@@ -17,7 +17,7 @@ namespace KartaMobiExporter
 
         public MainWindowViewModel()
         {
-            _taskbarIcon = new TaskbarIcon {Icon = Resources.Roundicons_100_Free_Solid_Care_for_recycling , ToolTipText = "Karta.Mobi Exporter"};
+            _taskbarIcon = new TaskbarIcon {Icon = Resources.FreeIconExample, ToolTipText = "Karta.Mobi Exporter"};
             var communication = new Communication();
 
             var version = Assembly.GetEntryAssembly().GetName().Version;

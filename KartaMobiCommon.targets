@@ -2,27 +2,57 @@
     <PropertyGroup>  
         <Name>KartaMobiCommon</Name>  
     </PropertyGroup>  
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-		<PlatformTarget>AnyCPU</PlatformTarget>
+	
+	<!-- Настройки x86 -->
+	
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+		<PlatformTarget>x86</PlatformTarget>
 		<DebugSymbols>true</DebugSymbols>
 		<DebugType>full</DebugType>
 		<Optimize>false</Optimize>
-		<OutputPath>$(SolutionDir)\Build\Debug\$(MSBuildProjectName)\</OutputPath>
+		<OutputPath>$(SolutionDir)\Build\x86\Debug\$(MSBuildProjectName)\</OutputPath>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 		<ErrorReport>prompt</ErrorReport>
 		<WarningLevel>4</WarningLevel>
 	</PropertyGroup>
-		<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-		<PlatformTarget>AnyCPU</PlatformTarget>
+		<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+		<PlatformTarget>x86</PlatformTarget>
 		<DebugSymbols>false</DebugSymbols>
 		<DebugType>None</DebugType>
 		<GenerateDocumentation>false</GenerateDocumentation>
 		<Optimize>true</Optimize>
-		<OutputPath>$(SolutionDir)\Build\Release\$(MSBuildProjectName)\</OutputPath>
+		<OutputPath>$(SolutionDir)\Build\x86\Release\$(MSBuildProjectName)\</OutputPath>
 		<AllowedReferenceRelatedFileExtensions>
 		<!-- Prevent default XML and PDB files copied to output in RELEASE. Only *.allowedextension files will be included, which doesn't exist in my case. -->
 			*.pdb;
 			*.xml
 		</AllowedReferenceRelatedFileExtensions>
 	</PropertyGroup>   
+
+	<!-- Настройки x64 -->
+	
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+		<PlatformTarget>x64</PlatformTarget>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<Optimize>false</Optimize>
+		<OutputPath>$(SolutionDir)\Build\x64\Debug\$(MSBuildProjectName)\</OutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+	</PropertyGroup>
+		<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+		<PlatformTarget>x64</PlatformTarget>
+		<DebugSymbols>false</DebugSymbols>
+		<DebugType>None</DebugType>
+		<GenerateDocumentation>false</GenerateDocumentation>
+		<Optimize>true</Optimize>
+		<OutputPath>$(SolutionDir)\Build\x64\Release\$(MSBuildProjectName)\</OutputPath>
+		<AllowedReferenceRelatedFileExtensions>
+		<!-- Prevent default XML and PDB files copied to output in RELEASE. Only *.allowedextension files will be included, which doesn't exist in my case. -->
+			*.pdb;
+			*.xml
+		</AllowedReferenceRelatedFileExtensions>
+	</PropertyGroup>   	
+	
 </Project>  

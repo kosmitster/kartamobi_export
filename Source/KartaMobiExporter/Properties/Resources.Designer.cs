@@ -63,9 +63,9 @@ namespace KartaMobiExporter.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
         /// </summary>
-        internal static System.Drawing.Icon Roundicons_100_Free_Solid_Care_for_recycling {
+        internal static System.Drawing.Icon FreeIconExample {
             get {
-                object obj = ResourceManager.GetObject("Roundicons_100_Free_Solid_Care_for_recycling", resourceCulture);
+                object obj = ResourceManager.GetObject("FreeIconExample", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

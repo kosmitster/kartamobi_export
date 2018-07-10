@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="en-us" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+	
+  <String Id="Company">Arcanite LLC</String>
+
+  <String Id="ProductNameFolder">KartaMobiExporter</String>
+
+  <String Id="ProductName_x86">KartaMobiExporter (32bit)</String>
+  <String Id="ProductName_x64">KartaMobiExporter (64bit)</String>
+
+  <String Id="Description">KartaMobiExporter</String>
+  <String Id="Keywords">KartaMobiExporter</String>
+  <String Id="Comments">KartaMobiExporter</String>
+
+  <String Id="DowngradeErrorMessage">A newer version of KartaMobiExporter is already installed.</String>
+
+  <String Id="Language">1049</String>
+
+</WixLocalization>

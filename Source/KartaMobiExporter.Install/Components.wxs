@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <Fragment>
+    <!-- Product Components -->
+    <ComponentGroup Id="ProductComponents" >
+      <ComponentRef Id="KartaMobiExporter.Core.dll"/>
+      <ComponentRef Id="Hardcodet.Wpf.TaskbarNotification.dll"/>
+      <ComponentRef Id="KartaMobiExporter.exe"/>
+      <ComponentRef Id="KartaMobiExporter.Dto.dll"/>
+      <ComponentRef Id="Newtonsoft.Json.dll"/>
+      <ComponentRef Id="Prism.dll"/>
+      <ComponentRef Id="RestSharp.dll"/>
+      <ComponentRef Id="System.Data.SQLite.dll"/>
+    </ComponentGroup>
+
+    <!-- Installed files -->
+    <DirectoryRef Id="INSTALLFOLDER" FileSource="..\..\Build\$(var.Platform)\$(var.Configuration)\KartaMobiExporter\">
+      <Component Id="KartaMobiExporter.Core.dll" Guid="{93983326-933B-4060-82C3-31ED6BF7DA0B}">
+        <File Id="KartaMobiExporter.Core.dll" Name="KartaMobiExporter.Core.dll" KeyPath="yes"/>
+        <!-- Remove start menu items -->
+          <RemoveFolder Id="RemoveStartMenu" Directory="InstallProgramMenuFolder" On="uninstall"/>
+      </Component>
+      <Component Id="Hardcodet.Wpf.TaskbarNotification.dll" Guid="{7B2E0B20-0951-4E70-BFD2-DD1C16C93E6F}">
+        <File Id="Hardcodet.Wpf.TaskbarNotification.dll" Name="Hardcodet.Wpf.TaskbarNotification.dll" KeyPath="yes"/>
+      </Component>
+      <Component Id="KartaMobiExporter.exe" Guid="{E8993792-C426-47F5-8D97-91276206E450}">
+        <File Id="KartaMobiExporter.exe" Name="KartaMobiExporter.exe" KeyPath="yes"/>
+      </Component>
+      <Component Id="KartaMobiExporter.Dto.dll" Guid="{D0FF06C5-6576-41EF-8D8D-B7662CE1474B}">
+        <File Id="KartaMobiExporter.Dto.dll" Name="KartaMobiExporter.Dto.dll" KeyPath="yes"/>
+      </Component>
+      <Component Id="Newtonsoft.Json.dll" Guid="{9FBD02ED-10BA-4707-973E-794961200604}">
+        <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" KeyPath="yes"/>
+      </Component>
+      <Component Id="Prism.dll" Guid="{CF70C57A-ED8C-4FDE-8B41-AE5BDDA5EAD2}">
+        <File Id="Prism.dll" Name="Prism.dll" KeyPath="yes"/>
+      </Component>
+      <Component Id="RestSharp.dll" Guid="{B7A72FF1-F17D-4329-AE71-79C89F267594}">
+        <File Id="RestSharp.dll" Name="RestSharp.dll" KeyPath="yes"/>
+      </Component>
+      <Component Id="System.Data.SQLite.dll" Guid="{87F330FA-6A00-46EC-B16B-E60D71048043}">
+        <File Id="System.Data.SQLite.dll" Name="System.Data.SQLite.dll" KeyPath="yes"/>
+      </Component>
+
+
+    </DirectoryRef>
+
+
+    
+  </Fragment>
+  
+</Wix>
