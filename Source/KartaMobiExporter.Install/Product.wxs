@@ -8,16 +8,9 @@
     <?define ProductCode = "{3FA37FB8-85CE-4EF4-8429-1B9D52E7B958}" ?>
   <?endif?>
 
-  <?if $(var.Configuration) = Debug ?>
-    <?define ConfigurationType = "Debug" ?>
-  <?else?>
-    <?define ConfigurationType = "Release" ?>
-  <?endif ?>
-
   <!-- Fixed upgrade Id -->
   <?define UpgradeCode = "{66FCC1EE-EF32-4B12-AF35-797C36424446}"?>
 
-  <?define BuildVersion = 1.0.0.1?>
   
   <!-- Define main product -->
 	<Product Id="$(var.ProductCode)"
@@ -36,8 +29,7 @@
              Description="!(loc.Description)"
              Keywords="!(loc.Keywords)"
              Comments="!(loc.Comments)"
-             Languages="!(loc.Language)"
-              />
+             Languages="!(loc.Language)"/>
 
     <!-- Downgrade error message -->
 		<MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeErrorMessage)" />
@@ -65,10 +57,9 @@
 
     <!-- Define components, shortcuts, files etc... for installer -->
 		<Feature Id="ProductFeature" Title="KartaMobiExporter" Level="1">
-			<ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="PublishedComponents" />
 		</Feature>
 	</Product>
-
-
 
 </Wix>

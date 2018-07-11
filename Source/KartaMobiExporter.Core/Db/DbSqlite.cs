@@ -32,7 +32,12 @@ namespace KartaMobiExporter.Core.Db
         /// </summary>
         public DbSqlite()
         {
-            _dbFileName = AppDomain.CurrentDomain.BaseDirectory + "Db.sqlite";
+            string specialFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\KartaMobi";
+
+            if (!Directory.Exists(specialFolder)) Directory.CreateDirectory(specialFolder);
+
+
+            _dbFileName = specialFolder + "\\Db.sqlite";
 
 
             if (!File.Exists(_dbFileName)) SQLiteConnection.CreateFile(_dbFileName);
