@@ -20,7 +20,13 @@
 
           <!-- Our unique key for this component/shortcut -->
           <RegistryValue Id="RegShortcutKey" Root="HKCU" Key="SOFTWARE\!(loc.ProductNameFolder)" Name="Shortcut" Value="1" Type="integer" KeyPath="yes"/>
-          
+
+          <RegistryKey
+              Root="HKLM"
+              Key="Software\Microsoft\Windows\CurrentVersion\Run">
+            <RegistryValue Type="string" Name="!(loc.ProductName_$(var.Platform))" Value="[INSTALLFOLDER]KartaMobiExporter.exe"/>
+          </RegistryKey>
+                    
           <!-- Remove start menu items -->
           <RemoveFolder Id="RemoveStartMenu" Directory="InstallProgramMenuFolder" On="uninstall"/>
 
