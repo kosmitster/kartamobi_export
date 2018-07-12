@@ -21,6 +21,7 @@
           <!-- Our unique key for this component/shortcut -->
           <RegistryValue Id="RegShortcutKey" Root="HKCU" Key="SOFTWARE\!(loc.ProductNameFolder)" Name="Shortcut" Value="1" Type="integer" KeyPath="yes"/>
 
+          <!-- Add to startup -->
           <RegistryKey
               Root="HKLM"
               Key="Software\Microsoft\Windows\CurrentVersion\Run">
