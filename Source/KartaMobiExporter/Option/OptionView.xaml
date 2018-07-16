@@ -22,7 +22,7 @@
         </Grid.RowDefinitions>
 
         <TabControl Grid.Row="0" TabStripPlacement="Left">
-            <TabItem Header="Настройки DDS">
+            <TabItem Header="DDS">
                 <StackPanel>
                     <Label Content="Путь к серверу SQL" />
                     <TextBox Text="{Binding Option.DataSource}" />
@@ -34,7 +34,7 @@
                     <PasswordBox utility:PasswordHelper.Attach="True" utility:PasswordHelper.Password="{Binding Option.Password, Mode=TwoWay}" />
                 </StackPanel>
             </TabItem>
-            <TabItem Header="Настройки Karta.Mobi">
+            <TabItem Header="Karta.Mobi">
                 <StackPanel>
                     <Label Content="BToken" />
                     <TextBox Text="{Binding OptionKartaMobi.Btoken}" />

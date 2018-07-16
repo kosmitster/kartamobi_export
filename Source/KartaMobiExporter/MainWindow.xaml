@@ -40,7 +40,7 @@
             <TabItem Header="Настройки">
                 <option:OptionView DataContext="{Binding DataContext.OptionViewModel, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
             </TabItem>
-            <TabItem Header="Log">
+            <TabItem Header="Журнал работы">
                 <log:LogView DataContext="{Binding DataContext.LogViewModel, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
             </TabItem>
         </TabControl>
