@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KartaMobiExporter.Dto;
+using System;
 
 namespace KartaMobiExporter.Core.Dto
 {
@@ -40,21 +41,11 @@ namespace KartaMobiExporter.Core.Dto
         /// <summary>
         /// Тип транзакции
         /// </summary>
-        public TypeTransaction TypeTransaction { get; set; }
+        public TransactionType TransactionType { get; set; }
 
         /// <summary>
         /// Дата и время транзакции
         /// </summary>
         public DateTime TransactionDateTime { get; set; }
-    }
-
-    /// <summary>
-    /// Тип транзакции {7 = Начисление; 2 = Списание}
-    /// </summary>
-    public enum TypeTransaction
-    {
-        InCard = 7,
-        OutCard = 2,
-        AddToCard = 0
     }
 }

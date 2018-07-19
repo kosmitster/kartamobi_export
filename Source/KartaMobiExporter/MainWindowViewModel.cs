@@ -14,11 +14,12 @@ namespace KartaMobiExporter
     public class MainWindowViewModel : INotifyPropertyChanged
     {
         private readonly TaskbarIcon _taskbarIcon;
+        private Communication Communication;
 
         public MainWindowViewModel()
         {
-            _taskbarIcon = new TaskbarIcon {Icon = Resources.FreeIconExample, ToolTipText = "Karta.Mobi Exporter"};
-            var communication = new Communication();
+            _taskbarIcon = new TaskbarIcon { Icon = Resources.FreeIconExample, ToolTipText = "Karta.Mobi Exporter" };
+            Communication = new Communication();
 
             var version = Assembly.GetEntryAssembly().GetName().Version;
             Title = "Karta.Mobi exporter ver: " + version;
@@ -26,25 +27,42 @@ namespace KartaMobiExporter
             OptionViewModel = new OptionViewModel();
             LogViewModel = new LogViewModel();
 
-            StartCommand = new DelegateCommand(() => {
-                communication.Start();
-            });
+            StartCommand = new DelegateCommand(() =>
+            {
+                Communication.Start();
+            }, () => !execute);
 
-            StopCommand = new DelegateCommand(() => {
-                communication.Stop();
-            });
+            StopCommand = new DelegateCommand(() =>
+            {
+                Communication.Stop();
+            }, () => execute);
 
-            communication.PropertyChanged += (sender, args) =>
+            Communication.PropertyChanged += (sender, args) =>
             {
                 if (args.PropertyName == "State")
                 {
                     //Оповещаю при изменении состояния
                     Notify(((Communication)sender).State);
                     //Если синхронизация выполнена обновляю логи
-                    if (((Communication) sender).State == Communication.EnumState.Done)
+                    if (((Communication)sender).State == Communication.EnumState.Done)
                         LogViewModel.UpdateLogItem();
+
+                    RefreshCommand(!execute);
                 }
             };
+        }
+
+        private bool execute => Communication.State == Communication.EnumState.Start || Communication.State == Communication.EnumState.Working;
+
+        /// <summary>
+        /// Взбодрить комманды
+        /// </summary>
+        private void RefreshCommand(bool value)
+        {
+            StartCommand.RaiseCanExecuteChanged();
+            StopCommand.RaiseCanExecuteChanged();
+
+            OptionViewModel.RefreshCommand(value);
         }
 
         /// <summary>
@@ -65,12 +83,15 @@ namespace KartaMobiExporter
                     _taskbarIcon.ShowBalloonTip(Title, "Ошибка подключения к Karta.Mobi!", BalloonIcon.Error);
                     break;
                 case Communication.EnumState.Done:
-                    _taskbarIcon.ShowBalloonTip(Title, "Синхронизация выполнена!", BalloonIcon.Error);
+                    _taskbarIcon.ShowBalloonTip(Title, "Отправка данных выполнена!", BalloonIcon.Info);
+                    break;
+                case Communication.EnumState.Start:
+                    _taskbarIcon.ShowBalloonTip(Title, "Старт отправки данных!", BalloonIcon.Info);
                     break;
                 default:
-                    _taskbarIcon.ShowBalloonTip(Title, state.ToString(), BalloonIcon.Info);
+                    _taskbarIcon.ShowBalloonTip(Title, state.ToString(), BalloonIcon.Warning);
                     break;
-            }            
+            }
         }
 
         private LogViewModel _logViewModel;
@@ -109,6 +130,9 @@ namespace KartaMobiExporter
                 OnPropertyChanged();
             }
         }
+
+        private bool _isWork;
+        public bool IsWork { get => _isWork; set  { if (value == _isWork) return; _isWork = value; OnPropertyChanged(); } }
 
         public DelegateCommand StartCommand { get; set; }
         public DelegateCommand StopCommand { get; set; }

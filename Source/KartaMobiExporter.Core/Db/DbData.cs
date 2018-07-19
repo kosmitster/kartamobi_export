@@ -68,9 +68,9 @@ namespace KartaMobiExporter.Core.Db
                 if(brokenTransactions != null)
                     transactions.AddRange(brokenTransactions.Select(brokenTransaction => GetTransaction(brokenTransaction, sqlConnection)));
 
-                transactions.AddRange(GetTransactions(sqlConnection, TypeTransaction.AddToCard));
-                transactions.AddRange(GetTransactions(sqlConnection, TypeTransaction.InCard));
-                transactions.AddRange(GetTransactions(sqlConnection, TypeTransaction.OutCard));
+                transactions.AddRange(GetTransactions(sqlConnection, TransactionType.AddToCard));
+                transactions.AddRange(GetTransactions(sqlConnection, TransactionType.InCard));
+                transactions.AddRange(GetTransactions(sqlConnection, TransactionType.OutCard));
 
                 sqlConnection.Close();
             }
@@ -115,7 +115,7 @@ namespace KartaMobiExporter.Core.Db
                 result.TransactionId = (string) myReader["TransactionID"];
                 result.CardId = (string) myReader["CardID"];
                 result.Amount = (decimal) myReader["Sum"];
-                result.TypeTransaction = (TypeTransaction) myReader["TransactionType"];
+                result.TransactionType = (TransactionType) myReader["TransactionType"];
                 result.TransactionDateTime = (DateTime) myReader["TransactionDateTime"];
             }
             
@@ -136,7 +136,7 @@ namespace KartaMobiExporter.Core.Db
         /// <param name="typeTransaction">Тип транзакции</param>
         /// <returns></returns>
         private static IEnumerable<TransactionInfo> GetTransactions(SqlConnection sqlConnection,
-            TypeTransaction typeTransaction)
+            TransactionType typeTransaction)
         {
             var exportData = new List<TransactionInfo>();
             var storageProcedure = new SqlCommand
@@ -159,24 +159,23 @@ namespace KartaMobiExporter.Core.Db
             //@RecordCount
             var paramRecordCount = storageProcedure.Parameters.Add("@RecordCount", SqlDbType.Int);
             paramRecordCount.Direction = ParameterDirection.Input;
-            paramRecordCount.Value = 10000;
+            paramRecordCount.Value = int.MaxValue;
+            //paramRecordCount.Value = 15;
 
             //@TransactionType
             var paramTransactionType = storageProcedure.Parameters.Add("@TransactionType", SqlDbType.Int);
             paramTransactionType.Direction = ParameterDirection.Input;
             paramTransactionType.Value = (int) typeTransaction;
 
-
             var myReader = storageProcedure.ExecuteReader();
             while (myReader.Read())
             {
-
                 exportData.Add(new TransactionInfo
                 {
                     TransactionId = (string) myReader["TransactionID"],
                     CardId = (string) myReader["CardID"],
                     Amount = (decimal) myReader["Sum"],
-                    TypeTransaction = (TypeTransaction) myReader["TransactionType"],
+                    TransactionType = (TransactionType) myReader["TransactionType"],
                     TransactionDateTime = (DateTime) myReader["TransactionDateTime"]
                 });
 

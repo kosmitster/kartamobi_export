@@ -27,6 +27,11 @@ namespace KartaMobiExporter.Core.Db
         internal const string CommandCreateKartaMobiOption = @"CREATE TABLE IF NOT EXISTS OptionKartaMobi 
             (Btoken [VARCHAR](38), Login [VARCHAR](38), Password [VARCHAR](38))";
 
+        /*Логи*/
+        internal const string CommandCreateLog = @"CREATE TABLE IF NOT EXISTS Log 
+            (LogDateTime [DateTime], LogValue [VARCHAR](100))";
+
+
         /// <summary>
         /// Конструктор {создаёт базу в случае если её нет и все потраха}
         /// </summary>
@@ -74,6 +79,8 @@ namespace KartaMobiExporter.Core.Db
             AdapterSqlite.SetCommand(CommandCreateSqlOption, mDbConnection);
             //Создать таблицу для хранения настройки доступа к Karta.Mobi
             AdapterSqlite.SetCommand(CommandCreateKartaMobiOption, mDbConnection);
+            //Создать таблицу LOG
+            AdapterSqlite.SetCommand(CommandCreateLog, mDbConnection);
 
             mDbConnection.Close();
         }
@@ -126,11 +133,12 @@ namespace KartaMobiExporter.Core.Db
                 items.Add(new LogItem
                 {
                     CardId = (string)myReader["CardID"],
-                    Phone = (string) (myReader["Phone"] == DBNull.Value ? string.Empty : myReader["Phone"]),
-                    Card = (string) (myReader["Card"] == DBNull.Value ? string.Empty : myReader["Card"]),
-                    Amount = (decimal) myReader["Sum"],
+                    Phone = (string)(myReader["Phone"] == DBNull.Value ? string.Empty : myReader["Phone"]),
+                    Card = (string)(myReader["Card"] == DBNull.Value ? string.Empty : myReader["Card"]),
+                    Amount = (decimal)myReader["Sum"],
                     Date = ((DateTime)myReader["TransactionDateTime"]).ToString("dd.MM.yyyy HH:mm:ss"),
-                    Result = "Отправлено"
+                    Result = "Отправлено",
+                    TransactionType = (TransactionType)myReader["TransactionType"]
                 });
             }
             myReader.Close();
@@ -270,7 +278,7 @@ namespace KartaMobiExporter.Core.Db
             AdapterSqlite.SetCommand(
                 "INSERT INTO SentTransactions(TransactionID, CardID, TransactionType, Sum, TransactionDateTime, Phone, Card) VALUES ('" +
                 transactionInfo.TransactionId + "', '" + transactionInfo.CardId + "', " +
-                (int) transactionInfo.TypeTransaction + ", " +
+                (int) transactionInfo.TransactionType + ", " +
                 transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
                 ", '" + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "', '" +
                 transactionInfo.PhoneNumber + "', '" + transactionInfo.CardNumber + "')", mDbConnection);
@@ -293,7 +301,7 @@ namespace KartaMobiExporter.Core.Db
                 AdapterSqlite.SetCommand(
                     "INSERT INTO ErrorTransactions(TransactionID, CardID, TransactionType, Sum, TransactionDateTime, Phone, Card) VALUES ('" +
                     transactionInfo.TransactionId + "', '" + transactionInfo.CardId + "', " +
-                    (int) transactionInfo.TypeTransaction + ", " +
+                    (int) transactionInfo.TransactionType + ", " +
                     transactionInfo.Amount.ToString(CultureInfo.InvariantCulture) +
                     ", '" + transactionInfo.TransactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "', '" +
                     transactionInfo.PhoneNumber + "', '" + transactionInfo.CardNumber + "')", mDbConnection);
@@ -329,7 +337,7 @@ namespace KartaMobiExporter.Core.Db
         /// </summary>
         /// <param name="typeTransaction">Тип транзакции</param>
         /// <returns>Список отправленных транзакций</returns>
-        internal List<string> GetSentTransactions(TypeTransaction typeTransaction)
+        internal List<string> GetSentTransactions(TransactionType typeTransaction)
         {
             var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
             mDbConnection.Open();
@@ -346,9 +354,9 @@ namespace KartaMobiExporter.Core.Db
         /// </summary>
         /// <param name="typeTransaction">Тип транзакции</param>
         /// <returns>последняя дата отправки данных</returns>
-        public DateTime GetLatestSendDate(TypeTransaction typeTransaction)
+        public DateTime GetLatestSendDate(TransactionType typeTransaction)
         {
-            var latesSendDateTime = new DateTime(2000,1,1);
+            var latesSendDateTime = DateTime.Now;
 
             var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
             mDbConnection.Open();
@@ -375,5 +383,24 @@ namespace KartaMobiExporter.Core.Db
 
             return latesSendDateTime;
         }
+
+        /// <summary>
+        /// Сохранить строку LOG
+        /// </summary>
+        /// <param name="optionDDS"></param>
+        public void SaveLog(string LogValue)
+        {
+
+            var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
+            mDbConnection.Open();
+
+            //Сохранить Log
+            AdapterSqlite.SetCommand(
+                "INSERT INTO Log(LogDateTime, LogValue) VALUES ('" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")
+                + "', '" + LogValue + "')", mDbConnection);
+
+            mDbConnection.Close();
+        }
+
     }
 }

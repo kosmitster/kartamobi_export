@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:option="clr-namespace:KartaMobiExporter.Option"
     Title="{Binding Title}"
-    Width="450"
+    Width="600"
     Height="450"
     d:DataContext="{d:DesignInstance {x:Type local:MainWindowViewModel}}"
     Icon="pack://application:,,,/Resources/FreeIconExample.ico"
@@ -25,7 +25,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="0.055*" />
         </Grid.RowDefinitions>
 
         <StackPanel
@@ -45,10 +44,5 @@
             </TabItem>
         </TabControl>
 
-        <ProgressBar
-            Grid.Row="2"
-            Maximum="100"
-            Minimum="0"
-            Value="75" />
     </Grid>
 </Window>

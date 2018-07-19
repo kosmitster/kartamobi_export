@@ -9,6 +9,7 @@ namespace KartaMobiExporter.Option
 {
     public class OptionViewModel : INotifyPropertyChanged
     {
+        private bool _canExecute = true;
         private readonly DbSqlite _dbSqlite;
         public OptionViewModel()
         {
@@ -16,7 +17,7 @@ namespace KartaMobiExporter.Option
             Option = _dbSqlite.GetOptionDDS();
             OptionKartaMobi = _dbSqlite.GetOptionKartaMobi();
 
-            SaveCommand = new DelegateCommand(Save);
+            SaveCommand = new DelegateCommand(Save, () => _canExecute);
         }
 
         private void Save()
@@ -25,6 +26,16 @@ namespace KartaMobiExporter.Option
             _dbSqlite.SetOptionKartaMobi(OptionKartaMobi);
         }
         
+        /// <summary>
+        /// Взбодрить комманду 
+        /// </summary>
+        /// <param name="value"></param>
+        public void RefreshCommand(bool value)
+        {
+            _canExecute = value;
+            SaveCommand.RaiseCanExecuteChanged();
+        }
+
         public DelegateCommand SaveCommand { get; set; }
 
         public OptionDDS Option { get; set; }

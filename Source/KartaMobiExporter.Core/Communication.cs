@@ -24,7 +24,7 @@ namespace KartaMobiExporter.Core
         public Communication()
         {
             _timer.Elapsed += OnTimedEvent;
-            _timer.Interval = 5000;
+            _timer.Interval = 60000;
 
             State = EnumState.Disabled;
         }
@@ -64,13 +64,25 @@ namespace KartaMobiExporter.Core
             }
 
             _timer.Enabled = true;
+            State = EnumState.Start;
+            System.Diagnostics.Debug.WriteLine("Старт");
+            GlobalState.IsCancel = false;
         }
 
         private void OnTimedEvent(object sender, ElapsedEventArgs e)
         {
-            State = EnumState.Start;
-            DoIt();
-            State = EnumState.Done;
+            //Выполняю экспорт только в том случае, если он выполняется в данный момент
+            if(State != EnumState.Working)
+            {
+                State = EnumState.Working;
+                DoIt();
+                State = EnumState.Done;
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Очередной экспорт прошущен, так как экспорт в данный момент выполняется");
+            }
+
         }
 
         /// <summary>
@@ -81,6 +93,8 @@ namespace KartaMobiExporter.Core
             _timer.Enabled = false;
 
             State = EnumState.Stop;
+            System.Diagnostics.Debug.WriteLine("Стоп");
+            GlobalState.IsCancel = true;
         }
 
 
@@ -116,6 +130,13 @@ namespace KartaMobiExporter.Core
         {
             foreach (var transaction in transactions)
             {
+                if (GlobalState.IsCancel)
+                {
+                    LogWriter.Write("[!!!] " + 
+                                " Отмена выполнения пользователем!!!");
+                    return;
+                }
+
                 LogWriter.Write("[*] " + transaction.CardNumber +
                                 " -----------------------------------------------------");
                 if (!string.IsNullOrEmpty(transaction.PhoneNumber))
@@ -124,15 +145,15 @@ namespace KartaMobiExporter.Core
                     if (!string.IsNullOrEmpty(uToken) && transaction.CardNumber.Length <= 19 && transaction.Amount > 0)
                     {
                         restApiClient.SetNumberCard(transaction, uToken);
-                        switch (transaction.TypeTransaction)
+                        switch (transaction.TransactionType)
                         {
-                            case TypeTransaction.InCard:
+                            case TransactionType.InCard:
                                 restApiClient.SetAmountInCard(transaction, uToken);
                                 break;
-                            case TypeTransaction.AddToCard:
+                            case TransactionType.AddToCard:
                                 restApiClient.SetAmountInCard(transaction, uToken);
                                 break;
-                            case TypeTransaction.OutCard:
+                            case TransactionType.OutCard:
                                 restApiClient.SetAmountOutCard(transaction, uToken);
                                 break;
                             default:
@@ -155,6 +176,7 @@ namespace KartaMobiExporter.Core
         {
             Disabled,
             Start,
+            Working,
             Done,
             Stop,
             ErrorOption,

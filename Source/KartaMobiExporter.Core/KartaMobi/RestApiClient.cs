@@ -51,7 +51,7 @@ namespace KartaMobiExporter.Core.KartaMobi
         {
             bool result = false;
 
-            var path = "/api/v1/validate-login-data?" + "b_token=" + _bToken + "&" + "phone=" + _login + "&" + "password=" + _password;
+            var path = "/api/v1/validate-business-data?" + "b_token=" + _bToken + "&" + "email=" + _login + "&" + "password=" + _password;
             var answer = ExecuteHttp(path);
             if (answer.StatusCode == HttpStatusCode.OK && (bool)JObject.Parse(answer.Content)["status"])
             {

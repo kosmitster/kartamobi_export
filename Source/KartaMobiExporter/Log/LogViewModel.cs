@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Threading;
 using KartaMobiExporter.Annotations;
 using KartaMobiExporter.Core.Db;
 using KartaMobiExporter.Dto;
@@ -11,17 +12,27 @@ namespace KartaMobiExporter.Log
     public class LogViewModel : INotifyPropertyChanged
     {
         private readonly DbSqlite _dbSqlite;
+        private Dispatcher _dispatcher;
 
         public LogViewModel()
         {
+            _dispatcher = Dispatcher.CurrentDispatcher;
             _dbSqlite = new DbSqlite();
-            Items = new ObservableCollection<LogItem>(UpdateLogItem());
+            Items = new ObservableCollection<LogItem>(_dbSqlite.GetSentTransactions());
         }
 
 
-        internal List<LogItem> UpdateLogItem()
+        internal void UpdateLogItem()
         {
-            return _dbSqlite.GetSentTransactions();
+            _dispatcher.Invoke(new Action(() =>
+                        {
+                            Items.Clear();
+                            foreach (var item in _dbSqlite.GetSentTransactions())
+                            {
+                                Items.Add(item);
+                            }
+                            OnPropertyChanged(nameof(Items));
+                        }));
         }
 
         private ObservableCollection<LogItem> _items;
