@@ -356,7 +356,8 @@ namespace KartaMobiExporter.Core.Db
         /// <returns>последняя дата отправки данных</returns>
         public DateTime GetLatestSendDate(TransactionType typeTransaction)
         {
-            var latesSendDateTime = DateTime.Now;
+            var latesSendDateTime = DateTime.Now.AddMinutes(-2);
+            //var latesSendDateTime = new DateTime(2017,1,1);
 
             var mDbConnection = AdapterSqlite.GetSqLiteConnection(_dbFileName);
             mDbConnection.Open();
@@ -373,14 +374,14 @@ namespace KartaMobiExporter.Core.Db
                 {
                     latesSendDateTime =
                         DateTime.ParseExact((string) myReader["time"], "yyyy-MM-dd HH:mm:ss.fff",
-                            CultureInfo.InvariantCulture);
-                    Log.LogWriter.Write("[Debug] " + typeTransaction +" Начало периода = " + latesSendDateTime);
+                            CultureInfo.InvariantCulture);                    
                 }
             }
             myReader.Close();
 
             mDbConnection.Close();
 
+            Log.LogWriter.Write("[Debug] " + typeTransaction + " Начало периода = " + latesSendDateTime);
             return latesSendDateTime;
         }
 

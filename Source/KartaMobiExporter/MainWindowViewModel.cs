@@ -44,15 +44,17 @@ namespace KartaMobiExporter
                     //Оповещаю при изменении состояния
                     Notify(((Communication)sender).State);
                     //Если синхронизация выполнена обновляю логи
-                    if (((Communication)sender).State == Communication.EnumState.Done)
+                    if (((Communication)sender).State == Communication.EnumState.Start)
                         LogViewModel.UpdateLogItem();
 
                     RefreshCommand(!execute);
                 }
             };
+
+            StartCommand.Execute();
         }
 
-        private bool execute => Communication.State == Communication.EnumState.Start || Communication.State == Communication.EnumState.Working;
+        private bool execute => (Communication.State == Communication.EnumState.Start || Communication.State == Communication.EnumState.Working);
 
         /// <summary>
         /// Взбодрить комманды
@@ -82,14 +84,8 @@ namespace KartaMobiExporter
                 case Communication.EnumState.ErrorKartaMobiConnection:
                     _taskbarIcon.ShowBalloonTip(Title, "Ошибка подключения к Karta.Mobi!", BalloonIcon.Error);
                     break;
-                case Communication.EnumState.Done:
-                    _taskbarIcon.ShowBalloonTip(Title, "Отправка данных выполнена!", BalloonIcon.Info);
-                    break;
-                case Communication.EnumState.Start:
-                    _taskbarIcon.ShowBalloonTip(Title, "Старт отправки данных!", BalloonIcon.Info);
-                    break;
                 default:
-                    _taskbarIcon.ShowBalloonTip(Title, state.ToString(), BalloonIcon.Warning);
+                    //_taskbarIcon.ShowBalloonTip(Title, state.ToString(), BalloonIcon.Warning);
                     break;
             }
         }

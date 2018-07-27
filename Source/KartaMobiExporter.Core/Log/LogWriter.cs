@@ -1,4 +1,8 @@
-﻿namespace KartaMobiExporter.Core.Log
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+
+namespace KartaMobiExporter.Core.Log
 {
     public static class LogWriter
     {
@@ -8,8 +12,32 @@
         /// <param name="x">строка для записи</param>
         public static void Write(string x)
         {
-            System.Diagnostics.Debug.WriteLine(x.Remove(100));
-            
+            string specialFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\KartaMobi";
+            if (!Directory.Exists(specialFolder)) Directory.CreateDirectory(specialFolder);
+
+            DeleteOldFile(specialFolder);
+
+            using (StreamWriter file = new StreamWriter(specialFolder + @"\Log"+ DateTime.Now.Month +".txt", true))
+            {
+                file.WriteLine(x);
+                Debug.WriteLine(x);
+            }
+
+        }
+
+        /// <summary>
+        /// Удалить старые файлы лог за предыдущие месяцы
+        /// </summary>
+        /// <param name="specialFolder"></param>
+        private static void DeleteOldFile(string specialFolder)
+        {
+            foreach(var file in Directory.GetFiles(specialFolder, "*.txt"))
+            {
+                if (!file.Contains(DateTime.Now.Month.ToString()))
+                {
+                    File.Delete(file);
+                }
+            }
         }
     }
 }

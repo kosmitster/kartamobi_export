@@ -2,67 +2,40 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>
         <DirectoryRef Id="INSTALLFOLDER">
-            <Component Id="cmpBE3C1D05C7C90455322C9F819A57A07A" Guid="{192DC332-34FA-4FD9-9CFC-9FF0F80E0B4D}">
+            <Component Id="cmpBE3C1D05C7C90455322C9F819A57A07A" Guid="{5EFE79CF-0079-4BF3-94B0-26BF0C27DA9B}">
                 <File Id="filE7C602A91344AD969255F20A2CA7411A" KeyPath="yes" Source="$(var.BasePath)\Hardcodet.Wpf.TaskbarNotification.dll" />
             </Component>
-            <Component Id="cmp92758FBE7BAD0A8C22E2DF7485108D82" Guid="{0AAF30EB-542D-40FD-B927-8C9947B64B65}">
-                <File Id="fil37C16A438720B34E2BAED72C2359E6B8" KeyPath="yes" Source="$(var.BasePath)\Hardcodet.Wpf.TaskbarNotification.pdb" />
-            </Component>
-            <Component Id="cmp1AB3F692680AD43D977D2B4893C60651" Guid="{884D887C-71DE-4E7A-92DF-7E8A24738C1F}">
-                <File Id="fil8DCFE8E2064CED909E7B76E107F2D738" KeyPath="yes" Source="$(var.BasePath)\Hardcodet.Wpf.TaskbarNotification.xml" />
-            </Component>
-            <Component Id="cmpB4C7C0AADA9229E3F2D7666728AC248B" Guid="{641E67C9-6961-406B-BC43-85AF1301C846}">
+            <Component Id="cmpB4C7C0AADA9229E3F2D7666728AC248B" Guid="{91666623-31D9-47F5-8F7F-9530D2B35A5A}">
                 <File Id="fil59AAF5DD9A02F0B0F8069E45BF72C815" KeyPath="yes" Source="$(var.BasePath)\KartaMobiExporter.Core.dll" />
             </Component>
-            <Component Id="cmp10E6B5A701CFEE8AA881BEAC6503148C" Guid="{68C18050-9070-4C8C-A6DF-3A46949A98D5}">
-                <File Id="fil42BF0D2CC81702E4CE21176C45FCE55E" KeyPath="yes" Source="$(var.BasePath)\KartaMobiExporter.Core.pdb" />
-            </Component>
-            <Component Id="cmp214A0DACE68752A4275E02F618E60418" Guid="{8DC81C2B-7CC4-4FEA-A0C6-90B9A3E7BD4D}">
+            <Component Id="cmp214A0DACE68752A4275E02F618E60418" Guid="{351863E2-532D-4227-8F6A-2E4686EBB6EA}">
                 <File Id="filED077F1AA70CF2B2584836E7D0EEA630" KeyPath="yes" Source="$(var.BasePath)\KartaMobiExporter.Dto.dll" />
             </Component>
-            <Component Id="cmp7F23972C5DD84E8125D6D312EBCF5580" Guid="{AAA19F8F-D60B-4312-A43A-92E397855883}">
-                <File Id="filB73D375ED58AAEAE5D251299A2B0A32C" KeyPath="yes" Source="$(var.BasePath)\KartaMobiExporter.Dto.pdb" />
-            </Component>
-            <Component Id="cmpDA201A586ABCAE410C20C2A54EC073EC" Guid="{46272A9A-2053-4196-BEF8-68F518EBCFA1}">
+            <Component Id="cmpDA201A586ABCAE410C20C2A54EC073EC" Guid="{01B12A71-CAA0-4A60-A342-0A81951C8AA6}">
                 <File Id="filB17260E324037F5E7CDE57EE27286CB5" KeyPath="yes" Source="$(var.BasePath)\KartaMobiExporter.exe" />
             </Component>
-            <Component Id="cmpDAE6414A7FFCBE99B7803E72FCB4146E" Guid="{6559BEAE-0F2A-4E44-94E3-87B4DA13AF29}">
+            <Component Id="cmpDAE6414A7FFCBE99B7803E72FCB4146E" Guid="{9E5BF91F-179F-4530-8D33-B0F8445578DB}">
                 <File Id="fil70D859F6B7CAB3F12C3B35331CD08AB1" KeyPath="yes" Source="$(var.BasePath)\KartaMobiExporter.exe.config" />
             </Component>
-            <Component Id="cmp8666B429995441F190913DBFFF627046" Guid="{4B77E8EC-F719-4C69-B206-0A63DD999E90}">
-                <File Id="filE1477FD0043F3001B8470AF796B5F492" KeyPath="yes" Source="$(var.BasePath)\KartaMobiExporter.pdb" />
-            </Component>
-            <Component Id="cmpBC4FC00A26E7D32479D42D3411317FC5" Guid="{7EF8A98D-3F5B-499A-B95C-CDFE73602D3C}">
+            <Component Id="cmpBC4FC00A26E7D32479D42D3411317FC5" Guid="{2616B536-69E2-41EF-BF9B-511E27623E4C}">
                 <File Id="fil90A8AAD9FC612906D405476D61CEA3F4" KeyPath="yes" Source="$(var.BasePath)\Newtonsoft.Json.dll" />
             </Component>
-            <Component Id="cmp125C379E185231EFADA4CB4301BD0A9E" Guid="{610AF8CC-A5AA-4848-90CA-69DD3F360796}">
-                <File Id="fil3A2F44A7730E98D18E0948B3261DFABD" KeyPath="yes" Source="$(var.BasePath)\Newtonsoft.Json.xml" />
-            </Component>
-            <Component Id="cmp59564654D02343646998A8D6A6F0C25F" Guid="{9BB9C458-C11D-440A-9DBD-169A334D76AD}">
+            <Component Id="cmp59564654D02343646998A8D6A6F0C25F" Guid="{FF9DCC6D-9CC2-4F07-87A2-89D12949741F}">
                 <File Id="fil86F2842A309A2CABD479166F2B4E0588" KeyPath="yes" Source="$(var.BasePath)\Prism.dll" />
             </Component>
-            <Component Id="cmp8FB310F9B7BB1FD7615BBB9DC1ACCD20" Guid="{DE2B92EB-43DF-4E21-809E-E857D59E1533}">
-                <File Id="fil87DE65098BE319EDF72E6937036FA6EB" KeyPath="yes" Source="$(var.BasePath)\Prism.xml" />
-            </Component>
-            <Component Id="cmp43571D5B3C98C620B91CFB722AB036A9" Guid="{7086CDE6-40C2-4C57-94D5-1164719D0B89}">
+            <Component Id="cmp43571D5B3C98C620B91CFB722AB036A9" Guid="{27EE36C1-F97C-4F7B-877C-A836BCC9BBCB}">
                 <File Id="fil25C6F19EFB20FE77CA17650F918CB561" KeyPath="yes" Source="$(var.BasePath)\RestSharp.dll" />
             </Component>
-            <Component Id="cmp6B7CE49F5F3A518047B74FB6AC2251C5" Guid="{0334EEB4-611C-4E01-9962-5C70A7DC5303}">
+            <Component Id="cmp6B7CE49F5F3A518047B74FB6AC2251C5" Guid="{4A505C4F-584D-40A7-8820-322A17F89A73}">
                 <File Id="fil86030949C08D40073D1F77D572C14B0D" KeyPath="yes" Source="$(var.BasePath)\System.Data.SQLite.dll" />
             </Component>
-            <Component Id="cmpE25D4339F043AE9AF876A4620A6432C9" Guid="{E4F94681-9279-4C73-B418-F93BE6151ABF}">
-                <File Id="fil231CA1DE8C286CE1F5188773A945762D" KeyPath="yes" Source="$(var.BasePath)\System.Data.SQLite.dll.config" />
-            </Component>
-            <Component Id="cmpB0D00055965EDE11CC624747CE56C686" Guid="{6B623A03-9430-46BB-8662-937D96F3D258}">
-                <File Id="fil1AD5F5CE645B996B33CF1EF5C058BA4F" KeyPath="yes" Source="$(var.BasePath)\System.Data.SQLite.xml" />
-            </Component>
             <Directory Id="dir43FCCFA109FBF584D9155DCE31E452EB" Name="x64">
-                <Component Id="cmp19F6DF8A2ABC78D782D76F1EEC9A5800" Guid="{3920952B-42C3-43D9-8568-D9BEAD6B3175}">
+                <Component Id="cmp19F6DF8A2ABC78D782D76F1EEC9A5800" Guid="{70B0304D-34FB-4C5C-B1D2-30729DF2CF01}">
                     <File Id="filC7EA62E1AC64247AFBE682E8631402B8" KeyPath="yes" Source="$(var.BasePath)\x64\SQLite.Interop.dll" />
                 </Component>
             </Directory>
             <Directory Id="dir97F42FF68945B97AAE670945C4FDAE93" Name="x86">
-                <Component Id="cmp77484AF39EF2F8BD64E876C33A1C3E49" Guid="{D0512A35-8F8C-4B72-9071-45053427D6A3}">
+                <Component Id="cmp77484AF39EF2F8BD64E876C33A1C3E49" Guid="{89EFBF1D-D9FA-478D-A22E-495104BCE348}">
                     <File Id="filD2ACACD0EBAF09B1953E9C3793C13C69" KeyPath="yes" Source="$(var.BasePath)\x86\SQLite.Interop.dll" />
                 </Component>
             </Directory>
@@ -71,23 +44,14 @@
     <Fragment>
         <ComponentGroup Id="PublishedComponents">
             <ComponentRef Id="cmpBE3C1D05C7C90455322C9F819A57A07A" />
-            <ComponentRef Id="cmp92758FBE7BAD0A8C22E2DF7485108D82" />
-            <ComponentRef Id="cmp1AB3F692680AD43D977D2B4893C60651" />
             <ComponentRef Id="cmpB4C7C0AADA9229E3F2D7666728AC248B" />
-            <ComponentRef Id="cmp10E6B5A701CFEE8AA881BEAC6503148C" />
             <ComponentRef Id="cmp214A0DACE68752A4275E02F618E60418" />
-            <ComponentRef Id="cmp7F23972C5DD84E8125D6D312EBCF5580" />
             <ComponentRef Id="cmpDA201A586ABCAE410C20C2A54EC073EC" />
             <ComponentRef Id="cmpDAE6414A7FFCBE99B7803E72FCB4146E" />
-            <ComponentRef Id="cmp8666B429995441F190913DBFFF627046" />
             <ComponentRef Id="cmpBC4FC00A26E7D32479D42D3411317FC5" />
-            <ComponentRef Id="cmp125C379E185231EFADA4CB4301BD0A9E" />
             <ComponentRef Id="cmp59564654D02343646998A8D6A6F0C25F" />
-            <ComponentRef Id="cmp8FB310F9B7BB1FD7615BBB9DC1ACCD20" />
             <ComponentRef Id="cmp43571D5B3C98C620B91CFB722AB036A9" />
             <ComponentRef Id="cmp6B7CE49F5F3A518047B74FB6AC2251C5" />
-            <ComponentRef Id="cmpE25D4339F043AE9AF876A4620A6432C9" />
-            <ComponentRef Id="cmpB0D00055965EDE11CC624747CE56C686" />
             <ComponentRef Id="cmp19F6DF8A2ABC78D782D76F1EEC9A5800" />
             <ComponentRef Id="cmp77484AF39EF2F8BD64E876C33A1C3E49" />
         </ComponentGroup>

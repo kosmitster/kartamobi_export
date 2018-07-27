@@ -76,7 +76,7 @@ namespace KartaMobiExporter.Core
             {
                 State = EnumState.Working;
                 DoIt();
-                State = EnumState.Done;
+                State = EnumState.Start;
             }
             else
             {
@@ -118,6 +118,7 @@ namespace KartaMobiExporter.Core
             catch (Exception e)
             {
                 LogWriter.Write("[Error] " + e.Message + " Stack = " + e.StackTrace);
+                State = EnumState.ErrorRuntime;
             }
         }
 
@@ -177,12 +178,11 @@ namespace KartaMobiExporter.Core
             Disabled,
             Start,
             Working,
-            Done,
             Stop,
             ErrorOption,
             ErrorDDSConnection,
             ErrorKartaMobiConnection,
-            ErrorRunTime
+            ErrorRuntime            
         }
 
         private EnumState _state;
