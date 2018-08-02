@@ -9,36 +9,7 @@ Version 1.0
 ---
 **Общее описание**
 
-Для экспорта ExportToService.exe должен запускаться каждые 5 минут. 
-Настроить это можно с помощью scheduling windows или настроить job в MS SQL  
-
-**Настройка**
-
-Настройки программы находятся в файле ExportToService.exe.config	
-
-```sh
-<?xml version="1.0" encoding="utf-8"?>
-<configuration>
-  <startup> 
-    <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.5.2"/>
-  </startup>
-  <appSettings>
-    <!--Настройки для хранения лога-->
-    <add key="LogFilePath" value="C:\Temp"/> <!--путь к лог файлу-->
-    <!--Настройки для получения данных-->
-    <add key="DB_InitialCatalog" value="ddd"/> <!--название MS SQL базы-->
-    <add key="DB_dataSource" value="ServerDDS"/> <!--сервер MS SQL-->
-    <add key="DB_login" value="sa"/> <!--логин MS SQL-->
-    <add key="DB_password" value="superPassword"/> <!-- пароль MS SQL-->
-    <!--Настройки для записи данных-->
-    <add key="SqliteFilePath" value="C:\Temp\Db.sqlite"/> <!-- путь к файлу базы SQLite -->
-    <!--Настройки для отправки данных-->
-    <add key="KartaMobi_btoken" value="***"/> <!-- b_token клиента в Karta.Mobi -->
-    <add key="KartaMobi_login" value="***"/> <!-- логин клиента в Karta.Mobi -->
-    <add key="KartaMobi_password" value="***"/> <!-- пароль клиента в Karta.Mobi -->
-  </appSettings>
-</configuration>
-```
+Программа каждую минуту проверяет наличие "свежих" транзакций в системе 1С-Рарус РестАрт ред. 3: Депозитно-дисконтный сервер, отправляет данные в систему Karta.Mobi
 
 **Dependencies**
 
@@ -46,27 +17,26 @@ Version 1.0
 * RestSharp
 * System.Data.SQLite.Core
 * System.ValueTuple
+* WIX TOOLSET (http://wixtoolset.org/)
 
-**Инструкция публикации**
+**Инструкция сборки**
 
-1. Скомпилируйте проект
-2. Создайте папку, например C:\ExportToService
-3. Поместите в созданную папку следующие файлы:
-    * ExportToService.exe - исполняемый файл
-    * ExportToService.exe.config - файл конфигурации
-    * Newtonsoft.Json.dll
-    * RestSharp.dll
-    * System.Data.SQLite.dll
-    * System.ValueTuple.dll
-    * \x86\SQLite.Interop.dll
-    * \x64\SQLite.Interop.dll
-4. Организуйте запуск ExportToService.exe на ежедневной основе каждые 5 минут. Это можно сделать с помощью scheduling windows или настроить job в MS SQL.  
-		
+1. Необходимо скачать и установить WIX TOOLSET (http://wixtoolset.org/) WiX Toolset Visual Studio 2017 Extension и WiX v3.11.1 (Stable)
+2. Скомпилировать проект KartaMobiExporter.Install в Visual Studio community 2017 в режиме Release для той архитектуры которая необходима (x64 или x86)
+3. Результат x86  \KartaMobi\Build\x86\Release\KartaMobiExporter.Install\en-us\KartaMobiExporter-Release-x86.msi
+4. Результат x64  \KartaMobi\Build\x64\Release\KartaMobiExporter.Install\en-us\KartaMobiExporter-Release-x64.msi
+
+**Инструкция запуска**
+
+1. Установите программу KartaMobiExporter-Release-[АрхитектураВашегоПроцессора].msi
+2. Заполните настройки подключения нажимите СОХРАНИТЬ
+3. Нажмите ПУСК 	
 **Описание результатов работы**
 
-* В процессе работы программа получает информации о транзакциях начисления и списания бонусов из базы 1С-Рарус РестАрт ред. 3: Депозитно-дисконтный сервер за последние 5 минут
-* Отправляет информацию в сервис Karta.Mobi, одновременно с этим пишет в Лог (LogFilePath) подробные результаты своей работы.
-* Так же пишет информацию в базу SQLite (SqliteFilePath) 
+* В процессе работы программа получает информации о транзакциях начисления и списания бонусов из базы 1С-Рарус РестАрт ред. 3: Депозитно-дисконтный сервер каждую минуту
+* Отправляет информацию в сервис Karta.Mobi, одновременно с этим пишет в LOG подробные результаты своей работы. 
+* Так же пишет информацию в базу SQLite 
     * в таблицу SentTransactions - успешно отправленные транзакции
     * в таблицу ErrorTransactions - сбойные транзакции (в момент отправки недоступен интернет, недоступен сервис Karta.Mobi и прочее)
 * Перед отправкой "свежих" транзакций, отправляются "сбойные транзакции" из SQLite.ErrorTransactions
+* База SQLite и LOG находятся в каталоге c:\Users\ПОЛЬЗОВАТЕЛЬ\AppData\Local\KartaMobi\
