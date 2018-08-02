@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+      <ComponentGroup Id="ProductComponents">
+        <!-- Shortcut -->
+        <ComponentRef Id="MainAppShortcut"/>
+      </ComponentGroup>
+      
+      <DirectoryRef Id="INSTALLFOLDER" FileSource="..\..\Build\$(var.Platform)\$(var.Configuration)\KartaMobiExporter\">
+        
+        <!-- Shortcut to main application -->
+        <Component Id="MainAppShortcut" Guid="{4D638F3A-4902-4999-AF24-97912FD06DB0}">
+          <Shortcut Id="MainAppShortcut" 
+                    Name="!(loc.ProductName_$(var.Platform))"
+                    Target="[INSTALLFOLDER]KartaMobiExporter.exe"
+                    Directory="InstallProgramMenuFolder"
+                    WorkingDirectory="INSTALLFOLDER"
+                    Icon="icon.ico"
+                    />
+
+          <!-- Our unique key for this component/shortcut -->
+          <RegistryValue Id="RegShortcutKey" Root="HKCU" Key="SOFTWARE\!(loc.ProductNameFolder)" Name="Shortcut" Value="1" Type="integer" KeyPath="yes"/>
+
+          <!-- Add to startup -->
+          <RegistryKey
+              Root="HKLM"
+              Key="Software\Microsoft\Windows\CurrentVersion\Run">
+            <RegistryValue Type="string" Name="!(loc.ProductName_$(var.Platform))" Value="[INSTALLFOLDER]KartaMobiExporter.exe"/>
+          </RegistryKey>
+                    
+          <!-- Remove start menu items -->
+          <RemoveFolder Id="RemoveStartMenu" Directory="InstallProgramMenuFolder" On="uninstall"/>
+
+        </Component>        
+      </DirectoryRef>
+    </Fragment>
+</Wix>

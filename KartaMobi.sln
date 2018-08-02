@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2035
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KartaMobiExporter.Core", "Source\KartaMobiExporter.Core\KartaMobiExporter.Core.csproj", "{36267C7A-FE1E-4FF0-BE1F-8E71C2649554}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KartaMobiExporter", "Source\KartaMobiExporter\KartaMobiExporter.csproj", "{BB9A21A5-A39A-4CB6-9F95-8B1E7A034DEF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KartaMobiExporter.Dto", "Source\KartaMobiExporter.Dto\KartaMobiExporter.Dto.csproj", "{F24A6704-75DB-45FF-A1D4-EBE9E0EDC417}"
+EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "KartaMobiExporter.Install", "Source\KartaMobiExporter.Install\KartaMobiExporter.Install.wixproj", "{03FFB70A-BE13-412F-A765-516B84D3FF0D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{36267C7A-FE1E-4FF0-BE1F-8E71C2649554}.Debug|x64.ActiveCfg = Debug|x64
+		{36267C7A-FE1E-4FF0-BE1F-8E71C2649554}.Debug|x64.Build.0 = Debug|x64
+		{36267C7A-FE1E-4FF0-BE1F-8E71C2649554}.Debug|x86.ActiveCfg = Debug|x86
+		{36267C7A-FE1E-4FF0-BE1F-8E71C2649554}.Debug|x86.Build.0 = Debug|x86
+		{36267C7A-FE1E-4FF0-BE1F-8E71C2649554}.Release|x64.ActiveCfg = Release|x64
+		{36267C7A-FE1E-4FF0-BE1F-8E71C2649554}.Release|x64.Build.0 = Release|x64
+		{36267C7A-FE1E-4FF0-BE1F-8E71C2649554}.Release|x86.ActiveCfg = Release|x86
+		{36267C7A-FE1E-4FF0-BE1F-8E71C2649554}.Release|x86.Build.0 = Release|x86
+		{BB9A21A5-A39A-4CB6-9F95-8B1E7A034DEF}.Debug|x64.ActiveCfg = Debug|x64
+		{BB9A21A5-A39A-4CB6-9F95-8B1E7A034DEF}.Debug|x64.Build.0 = Debug|x64
+		{BB9A21A5-A39A-4CB6-9F95-8B1E7A034DEF}.Debug|x86.ActiveCfg = Debug|x86
+		{BB9A21A5-A39A-4CB6-9F95-8B1E7A034DEF}.Debug|x86.Build.0 = Debug|x86
+		{BB9A21A5-A39A-4CB6-9F95-8B1E7A034DEF}.Release|x64.ActiveCfg = Release|x64
+		{BB9A21A5-A39A-4CB6-9F95-8B1E7A034DEF}.Release|x64.Build.0 = Release|x64
+		{BB9A21A5-A39A-4CB6-9F95-8B1E7A034DEF}.Release|x86.ActiveCfg = Release|x86
+		{BB9A21A5-A39A-4CB6-9F95-8B1E7A034DEF}.Release|x86.Build.0 = Release|x86
+		{F24A6704-75DB-45FF-A1D4-EBE9E0EDC417}.Debug|x64.ActiveCfg = Debug|x64
+		{F24A6704-75DB-45FF-A1D4-EBE9E0EDC417}.Debug|x64.Build.0 = Debug|x64
+		{F24A6704-75DB-45FF-A1D4-EBE9E0EDC417}.Debug|x86.ActiveCfg = Debug|x86
+		{F24A6704-75DB-45FF-A1D4-EBE9E0EDC417}.Debug|x86.Build.0 = Debug|x86
+		{F24A6704-75DB-45FF-A1D4-EBE9E0EDC417}.Release|x64.ActiveCfg = Release|x64
+		{F24A6704-75DB-45FF-A1D4-EBE9E0EDC417}.Release|x64.Build.0 = Release|x64
+		{F24A6704-75DB-45FF-A1D4-EBE9E0EDC417}.Release|x86.ActiveCfg = Release|x86
+		{F24A6704-75DB-45FF-A1D4-EBE9E0EDC417}.Release|x86.Build.0 = Release|x86
+		{03FFB70A-BE13-412F-A765-516B84D3FF0D}.Debug|x64.ActiveCfg = Debug|x64
+		{03FFB70A-BE13-412F-A765-516B84D3FF0D}.Debug|x86.ActiveCfg = Debug|x86
+		{03FFB70A-BE13-412F-A765-516B84D3FF0D}.Debug|x86.Build.0 = Debug|x86
+		{03FFB70A-BE13-412F-A765-516B84D3FF0D}.Release|x64.ActiveCfg = Release|x64
+		{03FFB70A-BE13-412F-A765-516B84D3FF0D}.Release|x64.Build.0 = Release|x64
+		{03FFB70A-BE13-412F-A765-516B84D3FF0D}.Release|x86.ActiveCfg = Release|x86
+		{03FFB70A-BE13-412F-A765-516B84D3FF0D}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {83598697-26F3-43F1-9E83-785073F3CE5D}
+	EndGlobalSection
+EndGlobal
