@@ -216,16 +216,25 @@ namespace KartaMobiExporter.Core.KartaMobi
             if (_inServiceBalanses.Any(x => x.CardId == cardId))
             {
                 _inServiceBalanses.Remove(_inServiceBalanses.Single(x => x.CardId == cardId));
+                Log.LogWriter.Write(@"[AddIntoServiceBalanceInfo REMOVE] phoneNumber = " + phoneNumber +
+                                    " cardId = " + cardId +
+                                    " bonuses = " + bonuses);
             }
 
-            _inServiceBalanses.Add(new BalanceInServiceInfo
+            var value = new BalanceInServiceInfo
             {
                 PhoneNumber = phoneNumber,
                 CardId = cardId,
                 Bonuses = bonuses,
                 UToken = uToken,
                 BalanceOnRealTime = _dbData.GetBalanceCardByOnRealTime(cardId)
-            });
+            };
+            _inServiceBalanses.Add(value);
+
+            Log.LogWriter.Write(@"[AddIntoServiceBalanceInfo ADD] phoneNumber = " + phoneNumber + 
+                                " cardId = " + cardId +
+                                " bonuses = " + value.Bonuses + 
+                                " BalanceOnRealTime = " + value.BalanceOnRealTime);
         }
 
         /// <summary>

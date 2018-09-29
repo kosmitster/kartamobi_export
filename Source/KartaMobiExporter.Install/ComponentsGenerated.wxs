@@ -2,40 +2,40 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>
         <DirectoryRef Id="INSTALLFOLDER">
-            <Component Id="cmpBE3C1D05C7C90455322C9F819A57A07A" Guid="{5EFE79CF-0079-4BF3-94B0-26BF0C27DA9B}">
+            <Component Id="cmpBE3C1D05C7C90455322C9F819A57A07A" Guid="{B0BEAF82-FEC3-4785-B1BA-770C44FBB545}">
                 <File Id="filE7C602A91344AD969255F20A2CA7411A" KeyPath="yes" Source="$(var.BasePath)\Hardcodet.Wpf.TaskbarNotification.dll" />
             </Component>
-            <Component Id="cmpB4C7C0AADA9229E3F2D7666728AC248B" Guid="{91666623-31D9-47F5-8F7F-9530D2B35A5A}">
+            <Component Id="cmpB4C7C0AADA9229E3F2D7666728AC248B" Guid="{27210281-F963-4E63-BA69-42D9421E9D56}">
                 <File Id="fil59AAF5DD9A02F0B0F8069E45BF72C815" KeyPath="yes" Source="$(var.BasePath)\KartaMobiExporter.Core.dll" />
             </Component>
-            <Component Id="cmp214A0DACE68752A4275E02F618E60418" Guid="{351863E2-532D-4227-8F6A-2E4686EBB6EA}">
+            <Component Id="cmp214A0DACE68752A4275E02F618E60418" Guid="{D134A84A-EDC3-4974-8981-8C488B72D0AE}">
                 <File Id="filED077F1AA70CF2B2584836E7D0EEA630" KeyPath="yes" Source="$(var.BasePath)\KartaMobiExporter.Dto.dll" />
             </Component>
-            <Component Id="cmpDA201A586ABCAE410C20C2A54EC073EC" Guid="{01B12A71-CAA0-4A60-A342-0A81951C8AA6}">
+            <Component Id="cmpDA201A586ABCAE410C20C2A54EC073EC" Guid="{BAA8129D-30A6-4DA1-964A-76942A86AAD9}">
                 <File Id="filB17260E324037F5E7CDE57EE27286CB5" KeyPath="yes" Source="$(var.BasePath)\KartaMobiExporter.exe" />
             </Component>
-            <Component Id="cmpDAE6414A7FFCBE99B7803E72FCB4146E" Guid="{9E5BF91F-179F-4530-8D33-B0F8445578DB}">
+            <Component Id="cmpDAE6414A7FFCBE99B7803E72FCB4146E" Guid="{8AEFECA4-3D33-47CD-94CF-B47C79D0BFCE}">
                 <File Id="fil70D859F6B7CAB3F12C3B35331CD08AB1" KeyPath="yes" Source="$(var.BasePath)\KartaMobiExporter.exe.config" />
             </Component>
-            <Component Id="cmpBC4FC00A26E7D32479D42D3411317FC5" Guid="{2616B536-69E2-41EF-BF9B-511E27623E4C}">
+            <Component Id="cmpBC4FC00A26E7D32479D42D3411317FC5" Guid="{AC377ED6-833C-46A0-8CDC-C5BB2BF4C4FB}">
                 <File Id="fil90A8AAD9FC612906D405476D61CEA3F4" KeyPath="yes" Source="$(var.BasePath)\Newtonsoft.Json.dll" />
             </Component>
-            <Component Id="cmp59564654D02343646998A8D6A6F0C25F" Guid="{FF9DCC6D-9CC2-4F07-87A2-89D12949741F}">
+            <Component Id="cmp59564654D02343646998A8D6A6F0C25F" Guid="{434F32A6-B7CD-4F1F-ADCB-769A4D4C011A}">
                 <File Id="fil86F2842A309A2CABD479166F2B4E0588" KeyPath="yes" Source="$(var.BasePath)\Prism.dll" />
             </Component>
-            <Component Id="cmp43571D5B3C98C620B91CFB722AB036A9" Guid="{27EE36C1-F97C-4F7B-877C-A836BCC9BBCB}">
+            <Component Id="cmp43571D5B3C98C620B91CFB722AB036A9" Guid="{162C5EC2-4491-48FE-B223-B69C1AB49D9F}">
                 <File Id="fil25C6F19EFB20FE77CA17650F918CB561" KeyPath="yes" Source="$(var.BasePath)\RestSharp.dll" />
             </Component>
-            <Component Id="cmp6B7CE49F5F3A518047B74FB6AC2251C5" Guid="{4A505C4F-584D-40A7-8820-322A17F89A73}">
+            <Component Id="cmp6B7CE49F5F3A518047B74FB6AC2251C5" Guid="{13D6A726-C4D0-4A4B-B9B8-0B93D685D002}">
                 <File Id="fil86030949C08D40073D1F77D572C14B0D" KeyPath="yes" Source="$(var.BasePath)\System.Data.SQLite.dll" />
             </Component>
             <Directory Id="dir43FCCFA109FBF584D9155DCE31E452EB" Name="x64">
-                <Component Id="cmp19F6DF8A2ABC78D782D76F1EEC9A5800" Guid="{70B0304D-34FB-4C5C-B1D2-30729DF2CF01}">
+                <Component Id="cmp19F6DF8A2ABC78D782D76F1EEC9A5800" Guid="{302E70B1-CC6B-4CD3-98A7-6D327ADA7FB4}">
                     <File Id="filC7EA62E1AC64247AFBE682E8631402B8" KeyPath="yes" Source="$(var.BasePath)\x64\SQLite.Interop.dll" />
                 </Component>
             </Directory>
             <Directory Id="dir97F42FF68945B97AAE670945C4FDAE93" Name="x86">
-                <Component Id="cmp77484AF39EF2F8BD64E876C33A1C3E49" Guid="{89EFBF1D-D9FA-478D-A22E-495104BCE348}">
+                <Component Id="cmp77484AF39EF2F8BD64E876C33A1C3E49" Guid="{32D6A76B-DE65-40B8-A9A6-939FD65AB279}">
                     <File Id="filD2ACACD0EBAF09B1953E9C3793C13C69" KeyPath="yes" Source="$(var.BasePath)\x86\SQLite.Interop.dll" />
                 </Component>
             </Directory>

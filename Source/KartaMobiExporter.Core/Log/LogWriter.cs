@@ -12,17 +12,22 @@ namespace KartaMobiExporter.Core.Log
         /// <param name="x">строка для записи</param>
         public static void Write(string x)
         {
-            string specialFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\KartaMobi";
-            if (!Directory.Exists(specialFolder)) Directory.CreateDirectory(specialFolder);
-
-            DeleteOldFile(specialFolder);
-
-            using (StreamWriter file = new StreamWriter(specialFolder + @"\Log"+ DateTime.Now.Month +".txt", true))
+            try
             {
-                file.WriteLine(x);
+                string specialFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\KartaMobi";
+                if (!Directory.Exists(specialFolder)) Directory.CreateDirectory(specialFolder);
+
+                DeleteOldFile(specialFolder);
+
+                using (StreamWriter file = new StreamWriter(specialFolder + @"\Log" + DateTime.Now.Month + ".txt", true))
+                {
+                    file.WriteLine(x);
+                }
+            }
+            catch (Exception)
+            {
                 Debug.WriteLine(x);
             }
-
         }
 
         /// <summary>
